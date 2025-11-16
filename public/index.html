@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CON ANIMA - Управление студентами</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      .card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+      }
+      .student-card {
+        border-left: 4px solid #0d6efd;
+      }
+      .badge-lessons {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+      }
+      .alert-custom {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-dark bg-primary mb-4">
+      <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">
+          <i class="bi bi-mortarboard-fill"></i> CON ANIMA
+        </span>
+        <div class="d-flex align-items-center">
+          <span class="text-white me-3" id="teacherName">
+            <i class="bi bi-person-circle"></i>
+            <span id="teacherNameText">Преподаватель</span>
+          </span>
+          <button class="btn btn-outline-light btn-sm" onclick="logout()">
+            <i class="bi bi-box-arrow-right"></i> Выйти
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <!-- Уведомления -->
+      <div id="notifications"></div>
+
+      <!-- Кнопка добавить студента -->
+      <div class="row mb-4">
+        <div class="col">
+          <button
+            class="btn btn-primary btn-lg"
+            data-bs-toggle="modal"
+            data-bs-target="#addStudentModal"
+          >
+            <i class="bi bi-plus-circle"></i> Добавить студента
+          </button>
+        </div>
+      </div>
+
+      <!-- Список студентов -->
+      <div class="row" id="studentsList">
+        <div class="col-12 text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модальное окно - Добавить студента -->
+    <div class="modal fade" id="addStudentModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Добавить нового студента</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="addStudentForm">
+              <div class="mb-3">
+                <label class="form-label">Имя *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="addFirstName"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Фамилия</label>
+                <input type="text" class="form-control" id="addLastName" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Отчество</label>
+                <input type="text" class="form-control" id="addMiddleName" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Количество уроков *</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="addTotalLessons"
+                  value="8"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Сумма оплаты (тг) *</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="addPaidAmount"
+                  value="0"
+                  required
+                />
+              </div>
+              <div class="form-check mb-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="addIsPaid"
+                />
+                <label class="form-check-label" for="addIsPaid">
+                  Оплачено
+                </label>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Отмена
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="addStudent()"
+            >
+              Добавить
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модальное окно - Редактировать студента -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Редактировать студента</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editStudentForm">
+              <input type="hidden" id="editStudentId" />
+              <div class="mb-3">
+                <label class="form-label">Имя *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editFirstName"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Фамилия</label>
+                <input type="text" class="form-control" id="editLastName" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Отчество</label>
+                <input type="text" class="form-control" id="editMiddleName" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Всего уроков</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="editTotalLessons"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Осталось уроков</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="editRemainingLessons"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Сумма оплаты (тг)</label>
+                <input type="number" class="form-control" id="editPaidAmount" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Пропуски</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="editMissedClasses"
+                />
+              </div>
+              <div class="form-check mb-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="editIsPaid"
+                />
+                <label class="form-check-label" for="editIsPaid">
+                  Оплачено
+                </label>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Отмена
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="updateStudent()"
+            >
+              Сохранить
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модальное окно - Подтверждение удаления -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">
+              <i class="bi bi-exclamation-triangle-fill"></i> Подтверждение
+              удаления
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>Вы уверены, что хотите удалить этого студента?</p>
+            <p class="text-muted mb-0">Это действие нельзя отменить.</p>
+            <input type="hidden" id="deleteStudentId" />
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Отмена
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              onclick="confirmDelete()"
+            >
+              <i class="bi bi-trash"></i> Удалить
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
