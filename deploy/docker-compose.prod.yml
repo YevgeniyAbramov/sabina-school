@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  app:
+    image: yabramov228/sabina-school:latest
+    container_name: sabina_school_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - db_host=db
+      - db_port=5432
+      - db_user=${db_user}
+      - db_password=${db_password}
+      - db_name=${db_name}
+      - db_sslmode=disable
+    depends_on:
+      - db
+    networks:
+      - school_network
+
+  db:
+    image: postgres:16-alpine
+    container_name: sabina_school_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${db_user}
+      POSTGRES_PASSWORD: ${db_password}
+      POSTGRES_DB: ${db_name}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - school_network
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  school_network:
+    driver: bridge
