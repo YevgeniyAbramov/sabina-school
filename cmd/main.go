@@ -12,8 +12,10 @@ import (
 )
 
 func main() {
+	// Пытаемся загрузить .env, но не падаем если его нет
+	// В Docker используются переменные окружения из docker-compose
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file:", err)
+		log.Println("Warning: .env file not found, using environment variables")
 	}
 
 	db.InitDB()

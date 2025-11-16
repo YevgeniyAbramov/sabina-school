@@ -8,6 +8,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      - port=3000
       - db_host=db
       - db_port=5432
       - db_user=${db_user}
