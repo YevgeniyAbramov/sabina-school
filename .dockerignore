@@ -9,5 +9,4 @@ tmp/
 temp/
 *.log
 .DS_Store
-- docker-compose.yml 
 
