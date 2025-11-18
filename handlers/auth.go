@@ -39,7 +39,6 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	// Проверяем пароль (пока без шифрования)
 	if teacher.Password != req.Password {
 		return c.Status(401).JSON(fiber.Map{
 			"status":  false,
