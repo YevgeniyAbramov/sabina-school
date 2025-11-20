@@ -1,11 +1,42 @@
 // API Base URL
 const API_URL = "/api/v1";
 const paidToggleRegistry = {};
+let allStudents = [];
+const filters = {
+  sort: "created_desc",
+  status: "all",
+  remaining: "all",
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   checkAuth();
   setupPaidToggle("addPaidToggle", "addIsPaid");
   setupPaidToggle("editPaidToggle", "editIsPaid");
+  const sortSelect = document.getElementById("sortFilter");
+  const statusSelect = document.getElementById("statusFilter");
+  const remainingSelect = document.getElementById("remainingFilter");
+
+  if (sortSelect) {
+    sortSelect.addEventListener("change", (e) => {
+      filters.sort = e.target.value;
+      renderStudents();
+    });
+  }
+
+  if (statusSelect) {
+    statusSelect.addEventListener("change", (e) => {
+      filters.status = e.target.value;
+      renderStudents();
+    });
+  }
+
+  if (remainingSelect) {
+    remainingSelect.addEventListener("change", (e) => {
+      filters.remaining = e.target.value;
+      renderStudents();
+    });
+  }
+
   loadStudents();
 });
 
@@ -70,11 +101,54 @@ async function loadStudents() {
       return;
     }
 
-    displayStudents(data.data || []);
+    allStudents = data.data || [];
+    renderStudents();
   } catch (error) {
     showNotification("Ошибка подключения к серверу", "danger");
     console.error(error);
   }
+}
+
+function renderStudents() {
+  const filtered = applyFilters(allStudents);
+  displayStudents(filtered);
+}
+
+function applyFilters(students) {
+  let result = [...students];
+
+  // status filter
+  if (filters.status === "paid") {
+    result = result.filter((s) => s.is_paid);
+  } else if (filters.status === "unpaid") {
+    result = result.filter((s) => !s.is_paid);
+  }
+
+  // remaining lessons filter
+  if (filters.remaining === "low") {
+    result = result.filter(
+      (s) => s.remaining_lessons <= 2 && s.remaining_lessons > 0
+    );
+  } else if (filters.remaining === "zero") {
+    result = result.filter((s) => s.remaining_lessons === 0);
+  }
+
+  // sorting
+  result.sort((a, b) => {
+    switch (filters.sort) {
+      case "remaining_asc":
+        return a.remaining_lessons - b.remaining_lessons;
+      case "remaining_desc":
+        return b.remaining_lessons - a.remaining_lessons;
+      case "paid_desc":
+        return (b.paid_amount || 0) - (a.paid_amount || 0);
+      case "created_desc":
+      default:
+        return new Date(b.created_at) - new Date(a.created_at);
+    }
+  });
+
+  return result;
 }
 
 function displayStudents(students) {

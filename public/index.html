@@ -232,6 +232,18 @@
         background: rgba(248, 113, 113, 0.2);
         color: #b91c1c;
       }
+
+      .filter-dropdown .btn {
+        border-radius: 14px;
+        font-weight: 600;
+      }
+
+      .filter-dropdown-menu {
+        min-width: 360px;
+        border: none;
+        border-radius: 18px;
+        background: #fff;
+      }
     </style>
   </head>
   <body>
@@ -255,15 +267,66 @@
     <div class="container">
       <div id="notifications"></div>
 
-      <div class="row mb-4">
-        <div class="col">
+      <div class="row mb-4 gy-2 align-items-center">
+        <div class="col-lg-5">
           <button
-            class="btn btn-primary btn-lg"
+            class="btn btn-primary btn-lg w-100 w-lg-auto"
             data-bs-toggle="modal"
             data-bs-target="#addStudentModal"
           >
-            <i class="bi bi-plus-circle"></i> Добавить студента
+            <i class="bi bi-plus-circle"></i> Добавить ученика
           </button>
+        </div>
+        <div
+          class="col-lg-7 d-flex justify-content-lg-end justify-content-start"
+        >
+          <div class="dropdown filter-dropdown">
+            <button
+              class="btn btn-outline-secondary d-flex align-items-center gap-2"
+              type="button"
+              id="filtersDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i class="bi bi-sliders"></i> Фильтры
+            </button>
+            <div
+              class="dropdown-menu dropdown-menu-end p-3 filter-dropdown-menu shadow"
+              aria-labelledby="filtersDropdown"
+            >
+              <div class="mb-3">
+                <label class="form-label small text-muted"
+                  >Сортировка списка</label
+                >
+                <select id="sortFilter" class="form-select form-select-sm">
+                  <option value="created_desc">Недавно добавленные</option>
+                  <option value="remaining_asc">Меньше всего уроков</option>
+                  <option value="remaining_desc">Больше всего уроков</option>
+                  <option value="paid_desc">Самая высокая оплата</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small text-muted"
+                  >Платёжный статус</label
+                >
+                <select id="statusFilter" class="form-select form-select-sm">
+                  <option value="all">Все ученики</option>
+                  <option value="paid">Только «Оплачено»</option>
+                  <option value="unpaid">Только «Не оплачено»</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label small text-muted"
+                  >Остаток уроков</label
+                >
+                <select id="remainingFilter" class="form-select form-select-sm">
+                  <option value="all">Любой остаток</option>
+                  <option value="low">Меньше или равно 2 урокам</option>
+                  <option value="zero">Уроков не осталось</option>
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -365,7 +428,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Редактировать студента</h5>
+            <h5 class="modal-title">Редактировать данные ученика</h5>
             <button
               type="button"
               class="btn-close"
@@ -470,7 +533,7 @@
             ></button>
           </div>
           <div class="modal-body">
-            <p>Вы уверены, что хотите удалить этого студента?</p>
+            <p>Вы уверены, что хотите удалить этого ученика?</p>
             <p class="text-muted mb-0">Это действие нельзя отменить.</p>
             <input type="hidden" id="deleteStudentId" />
           </div>
