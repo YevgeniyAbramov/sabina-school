@@ -57,26 +57,29 @@ func CompleteLesson(ctx context.Context, id int, teacherID int) error {
 		return err
 	}
 
-	var lesson int
-	var PeidAmountLast int
-
 	if resp.RemainingLessons == 0 {
-		return errors.New("количетсво уроков истякло")
+		return errors.New("количество уроков истекло")
 	}
 
-	lesson = resp.RemainingLessons - 1
+	newRemaining := resp.RemainingLessons - 1
+	if newRemaining < 0 {
+		newRemaining = 0
+	}
 
-	// Если это последний урок - обнуляем баланс
-	if lesson == 0 {
-		PeidAmountLast = 0
-	} else {
-		// Рассчитываем стоимость одного урока: текущий баланс / оставшиеся уроки
+	newPaidAmount := resp.PaidAmount
+	if newRemaining == 0 {
+		newPaidAmount = 0
+	} else if resp.RemainingLessons > 0 {
 		lessonPrice := resp.PaidAmount / resp.RemainingLessons
-		// Вычитаем стоимость урока из оплаченной суммы
-		PeidAmountLast = resp.PaidAmount - lessonPrice
+		newPaidAmount = resp.PaidAmount - lessonPrice
 	}
 
-	err = db.CompleteLesson(ctx, lesson, id, PeidAmountLast, teacherID)
+	newIsPaid := resp.IsPaid
+	if newRemaining == 0 {
+		newIsPaid = false
+	}
+
+	err = db.CompleteLesson(ctx, newRemaining, id, newPaidAmount, teacherID, newIsPaid)
 	if err != nil {
 		return err
 	}
@@ -85,16 +88,13 @@ func CompleteLesson(ctx context.Context, id int, teacherID int) error {
 }
 
 func MarkMissed(ctx context.Context, id int, teacherID int) error {
-	// Получаем данные студента
 	student, err := db.GetStudentForId(ctx, id, teacherID)
 	if err != nil {
 		return err
 	}
 
-	// Увеличиваем счетчик пропусков
 	newMissedCount := student.MissedClasses + 1
 
-	// Обновляем в БД
 	err = db.MarkMissed(ctx, id, newMissedCount, teacherID)
 	if err != nil {
 		return err

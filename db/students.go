@@ -114,11 +114,13 @@ func UpdateStudent(ctx context.Context, id int, teacherID int, student models.St
 	return &result, nil
 }
 
-func CompleteLesson(ctx context.Context, lesson, id, paid, teacherID int) error {
+func CompleteLesson(ctx context.Context, lesson, id, paid, teacherID int, isPaid bool) error {
 	db := GetDB()
-	query := `UPDATE auth.student SET remaining_lessons = $1, paid_amount = $2, updated_at = NOW() WHERE id = $3 AND teacher_id = $4 AND deleted_at IS NULL`
+	query := `UPDATE auth.student 
+		SET remaining_lessons = $1, paid_amount = $2, is_paid = $3, updated_at = NOW() 
+		WHERE id = $4 AND teacher_id = $5 AND deleted_at IS NULL`
 
-	_, err := db.ExecContext(ctx, query, lesson, paid, id, teacherID)
+	_, err := db.ExecContext(ctx, query, lesson, paid, isPaid, id, teacherID)
 	if err != nil {
 		return err
 	}

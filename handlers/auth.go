@@ -7,14 +7,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// Login - простой handler для входа (пока без БД)
 func Login(c *fiber.Ctx) error {
 	var req struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}
 
-	// Парсим JSON из запроса
 	if err := c.BodyParser(&req); err != nil {
 		return c.JSON(fiber.Map{
 			"status":  false,
@@ -22,7 +20,6 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	// Проверяем что поля заполнены
 	if req.Username == "" || req.Password == "" {
 		return c.JSON(fiber.Map{
 			"status":  false,
@@ -39,7 +36,6 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	// Проверяем пароль (пока без шифрования)
 	if teacher.Password != req.Password {
 		return c.Status(401).JSON(fiber.Map{
 			"status":  false,

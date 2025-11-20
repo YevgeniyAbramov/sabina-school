@@ -1,29 +1,27 @@
 // API Base URL
 const API_URL = "/api/v1";
+const paidToggleRegistry = {};
 
-// Проверка авторизации при загрузке
 document.addEventListener("DOMContentLoaded", () => {
   checkAuth();
+  setupPaidToggle("addPaidToggle", "addIsPaid");
+  setupPaidToggle("editPaidToggle", "editIsPaid");
   loadStudents();
 });
 
-// Проверка авторизации
 function checkAuth() {
   const token = localStorage.getItem("auth_token");
   if (!token) {
-    // Если токена нет - редирект на страницу входа
     window.location.href = "/login.html";
     return;
   }
 
-  // Отображаем имя преподавателя если есть
   const teacherName = localStorage.getItem("teacher_name");
   if (teacherName) {
     document.getElementById("teacherNameText").textContent = teacherName;
   }
 }
 
-// Получить токен для запросов
 function getAuthHeaders() {
   const token = localStorage.getItem("auth_token");
   return {
@@ -32,14 +30,12 @@ function getAuthHeaders() {
   };
 }
 
-// Выход из системы
 function logout() {
   localStorage.removeItem("auth_token");
   localStorage.removeItem("teacher_name");
   window.location.href = "/login.html";
 }
 
-// Показать уведомление
 function showNotification(message, type = "success") {
   const notification = document.createElement("div");
   notification.className = `alert alert-${type} alert-dismissible fade show alert-custom`;
@@ -54,14 +50,12 @@ function showNotification(message, type = "success") {
   }, 5000);
 }
 
-// Загрузить всех студентов
 async function loadStudents() {
   try {
     const response = await fetch(`${API_URL}/students`, {
       headers: getAuthHeaders(),
     });
 
-    // Проверка на 401 - невалидный токен
     if (response.status === 401) {
       localStorage.removeItem("auth_token");
       localStorage.removeItem("teacher_name");
@@ -83,7 +77,6 @@ async function loadStudents() {
   }
 }
 
-// Отобразить студентов
 function displayStudents(students) {
   const container = document.getElementById("studentsList");
 
@@ -102,43 +95,46 @@ function displayStudents(students) {
         <div class="col-md-6 col-lg-4 mb-4">
             <div class="card student-card">
                 <div class="card-body">
-                    <h5 class="card-title">
-                        ${student.first_name} ${student.last_name || ""}
-                        ${
-                          student.is_paid
-                            ? '<i class="bi bi-check-circle-fill text-success"></i>'
-                            : ""
-                        }
-                    </h5>
-                    ${
-                      student.middle_name
-                        ? `<p class="text-muted mb-2">${student.middle_name}</p>`
-                        : ""
-                    }
-                    
-                     <div class="mb-3">
-                         <span class="badge bg-primary badge-lessons">
-                             <i class="bi bi-book"></i> Проведено: ${
-                               student.total_lessons - student.remaining_lessons
-                             } / ${student.total_lessons}
-                         </span>
-                         <span class="badge bg-info badge-lessons">
-                             <i class="bi bi-clock"></i> Осталось: ${
-                               student.remaining_lessons
-                             }
-                         </span>
-                        ${
-                          student.missed_classes > 0
-                            ? `
-                            <span class="badge bg-warning">
-                                <i class="bi bi-exclamation-triangle"></i> Пропусков: ${student.missed_classes}
-                            </span>
-                        `
-                            : ""
-                        }
+                    <div class="student-meta">
+                        <div>
+                            <h5 class="card-title">
+                                ${student.first_name} ${student.last_name || ""}
+                                ${
+                                  student.is_paid
+                                    ? '<i class="bi bi-check-circle-fill text-success ms-1"></i>'
+                                    : '<i class="bi bi-x-circle-fill text-danger ms-1"></i>'
+                                }
+                            </h5>
+                            ${
+                              student.middle_name
+                                ? `<p class="text-muted mb-0">${student.middle_name}</p>`
+                                : ""
+                            }
+                        </div>
+                        <div class="student-chip ${
+                          student.missed_classes > 0 ? "" : "muted"
+                        }" title="Количество пропусков">
+                            <i class="bi bi-exclamation-diamond-fill"></i>
+                            <span>${student.missed_classes}</span>
+                        </div>
                     </div>
-                    
-                    <p class="card-text">
+
+                    <div class="mb-3 d-flex gap-2 flex-wrap">
+                        <span class="badge badge-progress badge-lessons">
+                            <i class="bi bi-book"></i>
+                            Проведено: ${
+                              student.total_lessons - student.remaining_lessons
+                            } / ${student.total_lessons}
+                        </span>
+                        <span class="badge badge-remaining badge-lessons ${
+                          student.remaining_lessons <= 1 ? "critical" : ""
+                        }">
+                            <i class="bi bi-clock"></i>
+                            Осталось: ${student.remaining_lessons}
+                        </span>
+                    </div>
+
+                    <p class="card-text mb-3">
                         <strong>Оплата:</strong> ${student.paid_amount} тг
                     </p>
                     
@@ -184,7 +180,6 @@ function displayStudents(students) {
     .join("");
 }
 
-// Добавить студента
 async function addStudent() {
   const student = {
     first_name: document.getElementById("addFirstName").value,
@@ -193,10 +188,10 @@ async function addStudent() {
     total_lessons: parseInt(document.getElementById("addTotalLessons").value),
     remaining_lessons: parseInt(
       document.getElementById("addTotalLessons").value
-    ), // изначально = total
+    ),
     paid_amount: parseInt(document.getElementById("addPaidAmount").value),
     missed_classes: 0,
-    is_paid: document.getElementById("addIsPaid").checked,
+    is_paid: document.getElementById("addIsPaid").value === "true",
   };
 
   try {
@@ -214,6 +209,7 @@ async function addStudent() {
         document.getElementById("addStudentModal")
       ).hide();
       document.getElementById("addStudentForm").reset();
+      setPaidValue("addIsPaid", false);
       loadStudents();
     } else {
       showNotification(data.message, "danger");
@@ -224,7 +220,6 @@ async function addStudent() {
   }
 }
 
-// Редактировать студента (загрузить данные)
 async function editStudent(id) {
   try {
     const response = await fetch(`${API_URL}/student/${id}`, {
@@ -247,7 +242,7 @@ async function editStudent(id) {
       student.remaining_lessons;
     document.getElementById("editPaidAmount").value = student.paid_amount;
     document.getElementById("editMissedClasses").value = student.missed_classes;
-    document.getElementById("editIsPaid").checked = student.is_paid;
+    setPaidValue("editIsPaid", student.is_paid);
 
     new bootstrap.Modal(document.getElementById("editStudentModal")).show();
   } catch (error) {
@@ -256,7 +251,6 @@ async function editStudent(id) {
   }
 }
 
-// Сохранить изменения студента
 async function updateStudent() {
   const id = document.getElementById("editStudentId").value;
   const student = {
@@ -271,7 +265,7 @@ async function updateStudent() {
     missed_classes: parseInt(
       document.getElementById("editMissedClasses").value
     ),
-    is_paid: document.getElementById("editIsPaid").checked,
+    is_paid: document.getElementById("editIsPaid").value === "true",
   };
 
   try {
@@ -298,7 +292,6 @@ async function updateStudent() {
   }
 }
 
-// Урок проведен
 async function completeLesson(id) {
   try {
     const response = await fetch(`${API_URL}/student/${id}/complete-lesson`, {
@@ -320,7 +313,6 @@ async function completeLesson(id) {
   }
 }
 
-// Отметить пропуск
 async function markMissed(id) {
   try {
     const response = await fetch(`${API_URL}/student/${id}/mark-missed`, {
@@ -342,13 +334,11 @@ async function markMissed(id) {
   }
 }
 
-// Показать окно подтверждения удаления
 function deleteStudent(id) {
   document.getElementById("deleteStudentId").value = id;
   new bootstrap.Modal(document.getElementById("deleteConfirmModal")).show();
 }
 
-// Подтвердить удаление студента
 async function confirmDelete() {
   const id = document.getElementById("deleteStudentId").value;
 
@@ -372,5 +362,42 @@ async function confirmDelete() {
   } catch (error) {
     showNotification("Ошибка при удалении студента", "danger");
     console.error(error);
+  }
+}
+
+function setupPaidToggle(buttonId, inputId) {
+  const button = document.getElementById(buttonId);
+  const input = document.getElementById(inputId);
+  if (!button || !input) return;
+
+  const syncUI = () => {
+    const isPaid = input.value === "true";
+    if (isPaid) {
+      button.classList.remove("paid-state-unpaid");
+      button.classList.add("paid-state-paid");
+      button.innerHTML = '<i class="bi bi-cash-stack"></i> Оплачено';
+    } else {
+      button.classList.remove("paid-state-paid");
+      button.classList.add("paid-state-unpaid");
+      button.innerHTML =
+        '<i class="bi bi-exclamation-octagon-fill"></i> Не оплачено';
+    }
+  };
+
+  button.addEventListener("click", () => {
+    input.value = input.value === "true" ? "false" : "true";
+    syncUI();
+  });
+
+  paidToggleRegistry[inputId] = syncUI;
+  syncUI();
+}
+
+function setPaidValue(inputId, value) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  input.value = value ? "true" : "false";
+  if (paidToggleRegistry[inputId]) {
+    paidToggleRegistry[inputId]();
   }
 }

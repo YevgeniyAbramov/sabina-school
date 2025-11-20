@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Показать уведомление
 function showNotification(message, type = "success") {
   const notification = document.createElement("div");
   notification.className = `alert alert-${type} alert-dismissible fade show alert-custom`;
@@ -25,7 +24,6 @@ function showNotification(message, type = "success") {
   }, 5000);
 }
 
-// Обработка формы входа
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -52,17 +50,14 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     const data = await response.json();
 
     if (data.status && data.token) {
-      // Сохраняем токен в localStorage
       localStorage.setItem("auth_token", data.token);
 
-      // Сохраняем информацию о преподавателе (опционально)
       if (data.teacher) {
         localStorage.setItem("teacher_name", data.teacher.first_name);
       }
 
       showNotification("Вход выполнен успешно!", "success");
 
-      // Редирект на главную страницу через 1 секунду
       setTimeout(() => {
         window.location.href = "/";
       }, 1000);
@@ -75,7 +70,6 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 });
 
-// Enter для отправки формы
 document.getElementById("password").addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
     document.getElementById("loginForm").dispatchEvent(new Event("submit"));
