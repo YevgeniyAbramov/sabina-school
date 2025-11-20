@@ -10,7 +10,6 @@ import (
 )
 
 func CreateStudent(c *fiber.Ctx) error {
-	// Получаем teacher_id из middleware
 	teacherID := middleware.GetTeacherID(c)
 
 	var req models.Student
@@ -22,7 +21,6 @@ func CreateStudent(c *fiber.Ctx) error {
 		})
 	}
 
-	// Устанавливаем teacher_id для студента
 	req.TeacherID = teacherID
 
 	resp, err := service.CreateStudent(c.Context(), req)
@@ -41,7 +39,6 @@ func CreateStudent(c *fiber.Ctx) error {
 }
 
 func GetStudents(c *fiber.Ctx) error {
-	// Получаем teacher_id из middleware
 	teacherID := middleware.GetTeacherID(c)
 
 	resp, err := service.GetStudent(c.Context(), teacherID)
@@ -59,7 +56,6 @@ func GetStudents(c *fiber.Ctx) error {
 }
 
 func GetStudent(c *fiber.Ctx) error {
-	// Получаем teacher_id из middleware
 	teacherID := middleware.GetTeacherID(c)
 
 	idParam := c.Params("id")
@@ -86,7 +82,6 @@ func GetStudent(c *fiber.Ctx) error {
 }
 
 func DeleteStudent(c *fiber.Ctx) error {
-	// Получаем teacher_id из middleware
 	teacherID := middleware.GetTeacherID(c)
 
 	idParam := c.Params("id")
@@ -113,7 +108,6 @@ func DeleteStudent(c *fiber.Ctx) error {
 }
 
 func UpdateStudent(c *fiber.Ctx) error {
-	// Получаем teacher_id из middleware
 	teacherID := middleware.GetTeacherID(c)
 
 	idParam := c.Params("id")
@@ -149,7 +143,6 @@ func UpdateStudent(c *fiber.Ctx) error {
 }
 
 func CompleteLesson(c *fiber.Ctx) error {
-	// Получаем teacher_id из middleware
 	teacherID := middleware.GetTeacherID(c)
 
 	idParam := c.Params("id")
@@ -176,7 +169,6 @@ func CompleteLesson(c *fiber.Ctx) error {
 }
 
 func MarkMissed(c *fiber.Ctx) error {
-	// Получаем teacher_id из middleware
 	teacherID := middleware.GetTeacherID(c)
 
 	idParam := c.Params("id")
