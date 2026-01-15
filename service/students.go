@@ -16,8 +16,8 @@ func CreateStudent(ctx context.Context, student models.Student) (*models.Student
 	return result, nil
 }
 
-func GetStudent(ctx context.Context, teacherID int) ([]models.Student, error) {
-	result, err := db.GetStudent(ctx, teacherID)
+func GetStudent(ctx context.Context, teacherID int, isPaid *bool) ([]models.Student, error) {
+	result, err := db.GetStudent(ctx, teacherID, isPaid)
 	if err != nil {
 		return nil, err
 	}

@@ -40,8 +40,21 @@ func CreateStudent(c *fiber.Ctx) error {
 
 func GetStudents(c *fiber.Ctx) error {
 	teacherID := middleware.GetTeacherID(c)
+	param := c.Query("is_paid")
 
-	resp, err := service.GetStudent(c.Context(), teacherID)
+	var isPaid *bool
+	if param != "" {
+		paramBool, err := strconv.ParseBool(param)
+		if err != nil {
+			return c.JSON(fiber.Map{
+				"status":  false,
+				"message": "Error ParseBool" + err.Error(),
+			})
+		}
+		isPaid = &paramBool
+	}
+
+	resp, err := service.GetStudent(c.Context(), teacherID, isPaid)
 	if err != nil {
 		return c.JSON(fiber.Map{
 			"status":  false,

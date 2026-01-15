@@ -37,14 +37,22 @@ func CreateStudent(ctx context.Context, student models.Student) (*models.Student
 	return &result, nil
 }
 
-func GetStudent(ctx context.Context, teacherID int) ([]models.Student, error) {
+func GetStudent(ctx context.Context, teacherID int, isPaid *bool) ([]models.Student, error) {
 	db := GetDB()
 
-	query := `SELECT * FROM auth.student WHERE teacher_id = $1 AND deleted_at IS NULL ORDER BY created_at DESC`
+	query := `SELECT * FROM auth.student WHERE teacher_id = $1 AND deleted_at IS NULL`
 
 	var result []models.Student
+	var err error
 
-	err := db.SelectContext(ctx, &result, query, teacherID)
+	if isPaid != nil {
+		query += " AND is_paid = $2 ORDER BY created_at DESC"
+		err = db.SelectContext(ctx, &result, query, teacherID, *isPaid)
+	} else {
+		query += " ORDER BY created_at DESC"
+		err = db.SelectContext(ctx, &result, query, teacherID)
+	}
+
 	if err != nil {
 		return nil, err
 	}
