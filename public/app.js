@@ -1,11 +1,32 @@
 // API Base URL
 const API_URL = "/api/v1";
 const paidToggleRegistry = {};
+let allStudents = [];
+const filters = {
+  status: "all",
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   checkAuth();
   setupPaidToggle("addPaidToggle", "addIsPaid");
   setupPaidToggle("editPaidToggle", "editIsPaid");
+  const paymentQuickButtons = document.querySelectorAll(
+    "[data-payment-filter]"
+  );
+
+  if (paymentQuickButtons.length) {
+    paymentQuickButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const value = btn.getAttribute("data-payment-filter");
+        if (filters.status === value) return;
+        filters.status = value;
+        updateQuickPaymentFilter(value);
+        renderStudents();
+      });
+    });
+    updateQuickPaymentFilter(filters.status);
+  }
+
   loadStudents();
 });
 
@@ -70,14 +91,46 @@ async function loadStudents() {
       return;
     }
 
-    displayStudents(data.data || []);
+    allStudents = data.data || [];
+    renderStudents();
   } catch (error) {
     showNotification("Ошибка подключения к серверу", "danger");
     console.error(error);
   }
 }
 
-function displayStudents(students) {
+function renderStudents() {
+  const filtered = applyFilters(allStudents);
+  displayGridStudents(filtered);
+  updateQuickPaymentFilter(filters.status);
+}
+
+function applyFilters(students) {
+  let result = [...students];
+
+  // status filter
+  if (filters.status === "paid") {
+    result = result.filter((s) => s.is_paid);
+  } else if (filters.status === "unpaid") {
+    result = result.filter((s) => !s.is_paid);
+  }
+
+  // default sorting: недавние сверху
+  result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  return result;
+}
+
+function updateQuickPaymentFilter(value) {
+  const buttons = document.querySelectorAll("[data-payment-filter]");
+  if (!buttons.length) return;
+  buttons.forEach((btn) => {
+    const btnValue = btn.getAttribute("data-payment-filter");
+    btn.classList.toggle("active", btnValue === value);
+  });
+}
+
+function displayGridStudents(students) {
   const container = document.getElementById("studentsList");
 
   if (students.length === 0) {
@@ -268,6 +321,18 @@ async function updateStudent() {
     is_paid: document.getElementById("editIsPaid").value === "true",
   };
 
+  await submitStudentUpdate(id, student, {
+    onSuccess: () => {
+      bootstrap.Modal.getInstance(
+        document.getElementById("editStudentModal")
+      ).hide();
+    },
+  });
+}
+
+async function submitStudentUpdate(id, student, options = {}) {
+  const { successMessage = "Данные студента обновлены!", onSuccess } = options;
+
   try {
     const response = await fetch(`${API_URL}/student/${id}`, {
       method: "PUT",
@@ -278,10 +343,10 @@ async function updateStudent() {
     const data = await response.json();
 
     if (data.status) {
-      showNotification("Данные студента обновлены!", "success");
-      bootstrap.Modal.getInstance(
-        document.getElementById("editStudentModal")
-      ).hide();
+      showNotification(successMessage, "success");
+      if (typeof onSuccess === "function") {
+        onSuccess(data);
+      }
       loadStudents();
     } else {
       showNotification(data.message, "danger");
