@@ -5,7 +5,6 @@ import (
 	"sckool/models"
 )
 
-// GetTeacherByLogin - получить преподавателя по логину
 func GetTeacherByLogin(ctx context.Context, login string) (*models.Teacher, error) {
 	db := GetDB()
 
@@ -22,7 +21,6 @@ func GetTeacherByLogin(ctx context.Context, login string) (*models.Teacher, erro
 	return &teacher, nil
 }
 
-// GetTeacherByID - получить преподавателя по ID
 func GetTeacherByID(ctx context.Context, id int) (*models.Teacher, error) {
 	db := GetDB()
 

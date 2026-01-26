@@ -18,7 +18,6 @@ func GetDB() *sqlx.DB {
 }
 
 func InitDB() {
-	// Пытаемся загрузить .env, но не падаем если его нет
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("Warning: .env file not found in InitDB, using environment variables")

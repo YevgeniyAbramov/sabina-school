@@ -55,19 +55,21 @@ jobs:
           script: |
             cd /opt/sabina-school
 
-            # Создаем .env если его нет
-            if [ ! -f .env ]; then
-              echo "Creating .env file..."
-              cat > .env << 'EOF'
+            # Создаем .env 
+            echo "Creating .env file..."
+            cat > .env << 'EOF'
             db_host=db
             db_port=5432
             db_user=${{ secrets.DB_USER }}
             db_password=${{ secrets.DB_PASSWORD }}
             db_name=${{ secrets.DB_NAME }}
             db_sslmode=disable
+            es_username=${{ secrets.ES_USERNAME }}
+            es_password=${{ secrets.ES_PASSWORD }}
+            es_host=${{ secrets.ES_HOST }}
+            es_port=${{ secrets.ES_PORT }}
             DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             EOF
-            fi
 
             # Останавливаем старый контейнер
             docker-compose down || true

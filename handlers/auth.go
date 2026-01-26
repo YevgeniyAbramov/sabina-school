@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"sckool/db"
+	"sckool/logger"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -27,7 +28,6 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	// Ищем преподавателя в БД по логину
 	teacher, err := db.GetTeacherByLogin(c.Context(), req.Username)
 	if err != nil {
 		return c.Status(401).JSON(fiber.Map{
@@ -43,8 +43,8 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	// Генерируем токен с teacher_id внутри (формат: token-{id})
-	// Позже заменим на JWT
+	go logger.Log("login", teacher.Id, nil, "success", "Вход выполнен")
+
 	token := fmt.Sprintf("token-%d", teacher.Id)
 
 	return c.JSON(fiber.Map{
