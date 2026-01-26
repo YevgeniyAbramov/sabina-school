@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"sckool/db"
+	"sckool/logger"
 	"sckool/models"
 )
 
@@ -12,7 +13,7 @@ func CreateStudent(ctx context.Context, student models.Student) (*models.Student
 	if err != nil {
 		return nil, err
 	}
-
+	go logger.Log("create_student", student.TeacherID, &result.Id, "success", "Студент создан")
 	return result, nil
 }
 
@@ -40,6 +41,7 @@ func DeleteStudent(ctx context.Context, id int, teacherID int) error {
 		return err
 	}
 
+	go logger.Log("delete_student", teacherID, &id, "success", "Студент удален")
 	return nil
 }
 
@@ -48,6 +50,8 @@ func UpdateStudent(ctx context.Context, id int, teacherID int, student models.St
 	if err != nil {
 		return nil, err
 	}
+
+	go logger.Log("update_student", teacherID, &id, "success", "Студент обновлен")
 	return result, nil
 }
 
@@ -84,6 +88,7 @@ func CompleteLesson(ctx context.Context, id int, teacherID int) error {
 		return err
 	}
 
+	go logger.Log("complete_lesson", teacherID, &id, "success", "Урок завершен")
 	return nil
 }
 
@@ -100,5 +105,6 @@ func MarkMissed(ctx context.Context, id int, teacherID int) error {
 		return err
 	}
 
+	go logger.Log("mark_missed", teacherID, &id, "success", "Пропуск отмечен")
 	return nil
 }

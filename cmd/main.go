@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"sckool/db"
+	eslogger "sckool/logger"
 	"sckool/routes"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,19 +13,23 @@ import (
 )
 
 func main() {
-	// Пытаемся загрузить .env, но не падаем если его нет
-	// В Docker используются переменные окружения из docker-compose
 	if err := godotenv.Load(); err != nil {
 		log.Println("Warning: .env file not found, using environment variables")
 	}
 
 	db.InitDB()
 
-	port := os.Getenv("port")
+	esURL := os.Getenv("ELASTICSEARCH_URL")
+	esLogger, err := eslogger.NewElasticLogger(esURL)
+	if err != nil {
+		log.Printf("Warning: Elasticsearch not available: %v", err)
+	} else {
+		defer esLogger.Close()
+	}
 
+	port := os.Getenv("port")
 	app := fiber.New(fiber.Config{
 		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
-			// StatusCode defaults to 500
 			code := fiber.StatusInternalServerError
 
 			return ctx.Status(code).JSON(fiber.Map{
@@ -37,7 +42,6 @@ func main() {
 
 	app.Use(logger.New())
 
-	// Отдача статических файлов (HTML, JS, CSS)
 	app.Static("/", "./public")
 
 	routes.Use(app)
