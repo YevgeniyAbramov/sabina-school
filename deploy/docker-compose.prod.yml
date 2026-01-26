@@ -16,6 +16,8 @@ services:
       - db_name=${db_name}
       - db_sslmode=disable
       - ELASTICSEARCH_URL=http://${es_host}:${es_port}
+      - ELASTICSEARCH_USERNAME=${es_username}
+      - ELASTICSEARCH_PASSWORD=${es_password}
     depends_on:
       - db
       - elasticsearch
@@ -42,8 +44,9 @@ services:
     restart: always
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=${es_password} 
+      - "ES_JAVA_OPTS=-Xms256m -Xmx512m"
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
