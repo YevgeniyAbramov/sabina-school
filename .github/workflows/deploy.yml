@@ -54,6 +54,8 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             cd /opt/sabina-school
+            echo "Downloading latest docker-compose.yml..."
+            curl -o docker-compose.yml https://raw.githubusercontent.com/${{ github.repository }}/main/deploy/docker-compose.prod.yml
 
             # Создаем .env 
             echo "Creating .env file..."
