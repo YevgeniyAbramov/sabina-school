@@ -27,10 +27,16 @@ type ElasticLogger struct {
 
 var globalLogger *ElasticLogger
 
-func NewElasticLogger(url string) (*ElasticLogger, error) {
+func NewElasticLogger(url, username, password string) (*ElasticLogger, error) {
 	cfg := elasticsearch.Config{
 		Addresses: []string{url},
 	}
+
+	if username != "" && password != "" {
+		cfg.Username = username
+		cfg.Password = password
+	}
+
 	client, err := elasticsearch.NewClient(cfg)
 	if err != nil {
 		return nil, err

@@ -20,7 +20,9 @@ func main() {
 	db.InitDB()
 
 	esURL := os.Getenv("ELASTICSEARCH_URL")
-	esLogger, err := eslogger.NewElasticLogger(esURL)
+	esUsername := os.Getenv("ELASTICSEARCH_USERNAME")
+	esPassword := os.Getenv("ELASTICSEARCH_PASSWORD")
+	esLogger, err := eslogger.NewElasticLogger(esURL, esUsername, esPassword)
 	if err != nil {
 		log.Printf("Warning: Elasticsearch not available: %v", err)
 	} else {
