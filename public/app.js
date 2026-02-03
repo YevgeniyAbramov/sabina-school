@@ -706,23 +706,50 @@ async function loadChartsData() {
     statusChart.update();
 
     // Статистика уроков
-    const completedLessons = students.reduce(
-      (sum, s) => sum + (s.total_lessons - s.remaining_lessons),
-      0,
-    );
-    const remainingLessons = students.reduce(
-      (sum, s) => sum + s.remaining_lessons,
-      0,
-    );
-    const missedLessons = students.reduce(
-      (sum, s) => sum + s.missed_classes,
-      0,
-    );
+    const toNumber = (value) => {
+      const num = Number(value);
+      return Number.isFinite(num) ? num : 0;
+    };
+
+    let completedLessons = 0;
+    let remainingLessons = 0;
+    let missedLessons = 0;
+
+    students.forEach((s) => {
+      const total = Math.max(0, toNumber(s.total_lessons));
+      const remaining = Math.min(
+        total,
+        Math.max(0, toNumber(s.remaining_lessons)),
+      );
+      let missed = Math.max(0, toNumber(s.missed_classes));
+
+      if (total > 0 && missed > total) {
+        missed = 0;
+      }
+
+      const completed = Math.max(0, total - remaining);
+      completedLessons += completed;
+      remainingLessons += remaining;
+      missedLessons += missed;
+    });
+
     lessonsChart.data.datasets[0].data = [
       completedLessons,
       remainingLessons,
       missedLessons,
     ];
+
+    const lessonsValues = [completedLessons, remainingLessons, missedLessons];
+    const maxLessonsValue = Math.max(...lessonsValues);
+    const axisMax = Math.max(1, Math.ceil(maxLessonsValue * 1.2));
+    if (lessonsChart.options.scales?.y) {
+      lessonsChart.options.scales.y.beginAtZero = true;
+      lessonsChart.options.scales.y.max = axisMax;
+      lessonsChart.options.scales.y.ticks = {
+        stepSize: axisMax <= 5 ? 1 : Math.ceil(axisMax / 5),
+        callback: (value) => value.toLocaleString("ru-RU"),
+      };
+    }
     lessonsChart.update();
 
     // Загружаем данные по месяцам (пример - можно расширить API)
