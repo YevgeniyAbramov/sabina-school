@@ -557,3 +557,217 @@ async function loadMonthlySummary() {
     summaryAmount.textContent = "0₸";
   }
 }
+
+// Инициализация графиков
+let monthlyChart = null;
+let statusChart = null;
+let lessonsChart = null;
+
+function initCharts() {
+  // График динамики по месяцам (линейный)
+  const monthlyCtx = document.getElementById("monthlyChart");
+  if (monthlyCtx) {
+    monthlyChart = new Chart(monthlyCtx, {
+      type: "line",
+      data: {
+        labels: [
+          "Янв",
+          "Фев",
+          "Мар",
+          "Апр",
+          "Май",
+          "Июн",
+          "Июл",
+          "Авг",
+          "Сен",
+          "Окт",
+          "Ноя",
+          "Дек",
+        ],
+        datasets: [
+          {
+            label: "Доход (₸)",
+            data: [],
+            borderColor: "#5c6ac4",
+            backgroundColor: "rgba(92, 106, 196, 0.1)",
+            tension: 0.4,
+            fill: true,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function (value) {
+                return value.toLocaleString("ru-RU") + "₸";
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // Круговой график статусов оплаты
+  const statusCtx = document.getElementById("statusChart");
+  if (statusCtx) {
+    statusChart = new Chart(statusCtx, {
+      type: "doughnut",
+      data: {
+        labels: ["Оплачено", "Не оплачено"],
+        datasets: [
+          {
+            data: [0, 0],
+            backgroundColor: ["#10b981", "#ef4444"],
+            borderWidth: 0,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+        },
+      },
+    });
+  }
+
+  // Столбчатый график статистики уроков
+  const lessonsCtx = document.getElementById("lessonsChart");
+  if (lessonsCtx) {
+    lessonsChart = new Chart(lessonsCtx, {
+      type: "bar",
+      data: {
+        labels: ["Проведено", "Осталось", "Пропущено"],
+        datasets: [
+          {
+            label: "Количество",
+            data: [0, 0, 0],
+            backgroundColor: ["#3b82f6", "#0ea5e9", "#f59e0b"],
+            borderRadius: 8,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  }
+}
+
+async function loadChartsData() {
+  if (!monthlyChart || !statusChart || !lessonsChart) {
+    return;
+  }
+
+  try {
+    // Загружаем данные студентов для статистики
+    const response = await fetch(`${API_URL}/students`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    if (!data.status || !data.data) return;
+
+    const students = data.data;
+
+    // Статистика по статусам оплаты
+    const paidCount = students.filter((s) => s.is_paid).length;
+    const unpaidCount = students.length - paidCount;
+    statusChart.data.datasets[0].data = [paidCount, unpaidCount];
+    statusChart.update();
+
+    // Статистика уроков
+    const completedLessons = students.reduce(
+      (sum, s) => sum + (s.total_lessons - s.remaining_lessons),
+      0,
+    );
+    const remainingLessons = students.reduce(
+      (sum, s) => sum + s.remaining_lessons,
+      0,
+    );
+    const missedLessons = students.reduce(
+      (sum, s) => sum + s.missed_classes,
+      0,
+    );
+    lessonsChart.data.datasets[0].data = [
+      completedLessons,
+      remainingLessons,
+      missedLessons,
+    ];
+    lessonsChart.update();
+
+    // Загружаем данные по месяцам (пример - можно расширить API)
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const monthlyData = [];
+
+    for (let month = 1; month <= 12; month++) {
+      try {
+        const monthResponse = await fetch(
+          `${API_URL}/monthly-summary?year=${currentYear}&month=${month}`,
+          {
+            headers: getAuthHeaders(),
+          },
+        );
+        if (monthResponse.ok) {
+          const monthData = await monthResponse.json();
+          monthlyData.push(
+            monthData.status && monthData.data
+              ? monthData.data.total_amount || 0
+              : 0,
+          );
+        } else {
+          monthlyData.push(0);
+        }
+      } catch (error) {
+        monthlyData.push(0);
+      }
+    }
+
+    monthlyChart.data.datasets[0].data = monthlyData;
+    monthlyChart.update();
+  } catch (error) {
+    console.error("Ошибка загрузки данных для графиков:", error);
+  }
+}
+
+// Инициализация графиков при открытии модального окна
+document.addEventListener("DOMContentLoaded", () => {
+  const summaryModal = document.getElementById("summaryModal");
+  if (summaryModal) {
+    summaryModal.addEventListener("shown.bs.modal", () => {
+      if (!monthlyChart) {
+        initCharts();
+      }
+      setTimeout(() => {
+        loadChartsData();
+      }, 100);
+    });
+  }
+});
