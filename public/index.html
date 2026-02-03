@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
@@ -12,21 +12,60 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
+        /* Фоны */
         --bg-page: #fff8f2;
         --card-bg: #ffffff;
         --card-border: #f0e6d8;
         --card-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+
+        /* Текст */
         --text-primary: #1f2937;
         --text-muted: #6b7280;
+        --text-secondary: #9ca3af;
+
+        /* Основной акцент (единый для всего приложения) */
         --accent-start: #5c6ac4;
         --accent-end: #7c3aed;
-        --success-grad: linear-gradient(135deg, #34d399, #059669);
-        --warning-grad: linear-gradient(135deg, #fbbf24, #f59e0b);
-        --danger: #ef4444;
-        --info: #0ea5e9;
-        --primary: #2563eb;
+        --accent-gradient: linear-gradient(
+          120deg,
+          var(--accent-start),
+          var(--accent-end)
+        );
+
+        /* Семантические цвета */
+        --color-success: #10b981;
+        --color-success-dark: #059669;
+        --color-success-grad: linear-gradient(135deg, #34d399, #059669);
+
+        --color-warning: #f59e0b;
+        --color-warning-light: #fbbf24;
+        --color-warning-grad: linear-gradient(135deg, #fbbf24, #f59e0b);
+
+        --color-error: #ef4444;
+        --color-error-grad: linear-gradient(135deg, #f87171, #dc2626);
+
+        --color-info: #3b82f6;
+        --color-info-light: #0ea5e9;
+
+        /* Устаревшие (для обратной совместимости) */
+        --primary: var(--accent-start);
+        --danger: var(--color-error);
+        --info: var(--color-info-light);
+        --success-grad: var(--color-success-grad);
+        --warning-grad: var(--color-warning-grad);
+
+        /* Шрифты */
+        --font-accent:
+          "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
 
       * {
@@ -35,17 +74,28 @@
 
       body {
         background: var(--bg-page);
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
-          sans-serif;
+        font-family: var(--font-body);
         color: var(--text-primary);
       }
 
+      .navbar-brand,
+      .btn,
+      .card-title,
+      .modal-title,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6,
+      .btn-toolbar-primary,
+      .summary-card h3,
+      .summary-card h6 {
+        font-family: var(--font-accent);
+      }
+
       .navbar.bg-primary {
-        background: linear-gradient(
-          120deg,
-          var(--accent-start),
-          var(--accent-end)
-        ) !important;
+        background: var(--accent-gradient) !important;
         box-shadow: 0 15px 35px rgba(92, 106, 196, 0.35);
         border: none;
       }
@@ -55,12 +105,106 @@
         letter-spacing: -0.5px;
       }
 
+      .btn-nav-link {
+        border: none;
+        background: transparent;
+        padding: 0.25rem 0.5rem;
+        transition: opacity 0.2s ease;
+      }
+
+      .btn-nav-link:hover {
+        opacity: 0.9;
+      }
+
+      .btn-nav-link span,
+      .btn-nav-link .btn-text {
+        transition: opacity 0.2s ease;
+      }
+
+      .btn-nav-link:hover span,
+      .btn-nav-link:hover .btn-text {
+        opacity: 0.8;
+      }
+
+      .summary-card {
+        background: linear-gradient(135deg, #f8f9fa, #ffffff);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+        transition: box-shadow 0.2s ease;
+      }
+
+      .summary-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--accent-gradient);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.5rem;
+      }
+
+      .summary-card h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .summary-card h6 {
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      #monthlySummaryLabel {
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      #monthlySummaryAmount {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        word-break: break-word;
+      }
+
+      @media (max-width: 768px) {
+        #monthlySummaryAmount {
+          font-size: 1.75rem;
+        }
+        .summary-icon {
+          width: 50px;
+          height: 50px;
+          font-size: 1.25rem;
+        }
+      }
+
+      .user-avatar {
+        font-size: 4rem;
+        color: var(--accent-start);
+      }
+
+      .modal-content {
+        background: var(--bg-page);
+        border: 1px solid var(--card-border);
+      }
+
+      .modal-body {
+        background: var(--bg-page);
+      }
+
       .card {
         border: 1px solid var(--card-border);
         border-radius: 18px;
         background: var(--card-bg);
         box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
-        transition: box-shadow 0.25s ease, border-color 0.25s ease;
+        transition:
+          box-shadow 0.25s ease,
+          border-color 0.25s ease;
       }
 
       .student-card:hover {
@@ -104,33 +248,37 @@
       }
 
       .badge-progress {
-        background: var(--primary);
+        background: var(--accent-start);
       }
 
       .badge-remaining {
-        background: var(--info);
+        background: var(--color-info);
       }
       .badge-remaining.critical {
-        background: linear-gradient(135deg, #f87171, #dc2626);
+        background: var(--color-error-grad);
       }
 
       .btn {
         border-radius: 12px;
         font-weight: 500;
         border: none;
-        transition: box-shadow 0.2s ease, transform 0.2s ease;
+        transition:
+          box-shadow 0.2s ease,
+          transform 0.2s ease;
       }
 
       .btn-primary {
-        background-image: linear-gradient(135deg, var(--primary), #3b82f6);
+        background: var(--accent-gradient);
+        color: #fff;
       }
 
       .btn-success {
-        background-image: var(--success-grad);
+        background: var(--color-success-grad);
+        color: #fff;
       }
 
       .btn-warning {
-        background-image: var(--warning-grad);
+        background: var(--color-warning-grad);
         color: #1f2937;
         border: none;
       }
@@ -143,23 +291,23 @@
       }
 
       .btn-outline-primary {
-        border: 2px solid var(--primary);
-        color: var(--primary);
+        border: 2px solid var(--accent-start);
+        color: var(--accent-start);
         background: transparent;
       }
 
       .btn-outline-primary:hover {
-        background: var(--primary);
+        background: var(--accent-start);
         color: #fff;
       }
 
       .btn-outline-danger {
-        border: 2px solid var(--danger);
-        color: var(--danger);
+        border: 2px solid var(--color-error);
+        color: var(--color-error);
       }
 
       .btn-outline-danger:hover {
-        background: var(--danger);
+        background: var(--color-error);
         color: #fff;
       }
 
@@ -201,18 +349,20 @@
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
       }
       .paid-toggle-btn:focus {
         outline: none;
         box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
       }
       .paid-toggle-btn.paid-state-paid {
-        background: linear-gradient(135deg, #34d399, #059669);
+        background: var(--color-success-grad);
         color: #fff;
       }
       .paid-toggle-btn.paid-state-unpaid {
-        background: linear-gradient(135deg, #f97316, #dc2626);
+        background: var(--color-error-grad);
         color: #fff;
       }
       .paid-status-badge {
@@ -252,11 +402,7 @@
       }
 
       .payment-quick-filter .btn.active {
-        background: linear-gradient(
-          135deg,
-          var(--accent-start),
-          var(--accent-end)
-        );
+        background: var(--accent-gradient);
         color: #fff;
         box-shadow: 0 8px 20px rgba(92, 106, 196, 0.25);
       }
@@ -295,13 +441,23 @@
         <span class="navbar-brand mb-0 h1">
           <i class="bi bi-mortarboard-fill"></i> CON ANIMA
         </span>
-        <div class="d-flex align-items-center">
-          <span class="text-white me-3" id="teacherName">
-            <i class="bi bi-person-circle"></i>
+        <div class="d-flex align-items-center gap-2">
+          <button
+            class="btn btn-link text-white text-decoration-none btn-nav-link d-flex align-items-center me-1"
+            data-bs-toggle="modal"
+            data-bs-target="#summaryModal"
+            onclick="loadMonthlySummary()"
+          >
+            <i class="bi bi-graph-up me-2"></i>
+            <span class="btn-text">Итоги</span>
+          </button>
+          <button
+            class="btn btn-link text-white text-decoration-none btn-nav-link d-flex align-items-center"
+            data-bs-toggle="modal"
+            data-bs-target="#userModal"
+          >
+            <i class="bi bi-person-circle me-2"></i>
             <span id="teacherNameText">Преподаватель</span>
-          </span>
-          <button class="btn btn-outline-light btn-sm" onclick="logout()">
-            <i class="bi bi-box-arrow-right"></i> Выйти
           </button>
         </div>
       </div>
@@ -574,7 +730,114 @@
       </div>
     </div>
 
+    <div class="modal fade" id="summaryModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-graph-up me-2"></i>Итоги и аналитика
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-4">
+              <div class="col-12">
+                <div class="summary-card">
+                  <div class="d-flex align-items-start justify-content-between">
+                    <div class="flex-grow-1">
+                      <div class="mb-2">
+                        <span class="text-muted" id="monthlySummaryLabel"
+                          >За месяц</span
+                        >
+                      </div>
+                      <div>
+                        <h3 class="mb-0" id="monthlySummaryAmount">0₸</h3>
+                      </div>
+                    </div>
+                    <div class="summary-icon ms-3">
+                      <i class="bi bi-calendar-check"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="summary-card">
+                  <h6 class="text-muted mb-3">Динамика по месяцам</h6>
+                  <canvas id="monthlyChart" style="max-height: 300px"></canvas>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="summary-card">
+                  <h6 class="text-muted mb-3">Распределение по статусам</h6>
+                  <canvas id="statusChart" style="max-height: 250px"></canvas>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="summary-card">
+                  <h6 class="text-muted mb-3">Статистика уроков</h6>
+                  <canvas id="lessonsChart" style="max-height: 250px"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Закрыть
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="userModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-person-circle me-2"></i>Профиль
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="text-center mb-4">
+              <div class="user-avatar mb-3">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              <h5 id="userModalName">Преподаватель</h5>
+            </div>
+            <div class="d-grid gap-2">
+              <button
+                type="button"
+                class="btn btn-outline-danger"
+                onclick="
+                  logout();
+                  bootstrap.Modal.getInstance(
+                    document.getElementById('userModal'),
+                  ).hide();
+                "
+              >
+                <i class="bi bi-box-arrow-right me-2"></i>Выйти
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

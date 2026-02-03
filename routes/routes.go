@@ -23,5 +23,5 @@ func Use(app *fiber.App) {
 	protected.Put("/student/:id", handler.UpdateStudent)
 	protected.Post("/student/:id/complete-lesson", handler.CompleteLesson)
 	protected.Post("/student/:id/mark-missed", handler.MarkMissed)
-
+	protected.Get("/monthly-summary", handler.GetMonthlySummary)
 }

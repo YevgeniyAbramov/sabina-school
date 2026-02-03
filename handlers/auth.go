@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"fmt"
+	"sckool/auth"
 	"sckool/db"
 	"sckool/logger"
 
@@ -45,7 +45,13 @@ func Login(c *fiber.Ctx) error {
 
 	go logger.Log("login", teacher.Id, nil, "success", "Вход выполнен")
 
-	token := fmt.Sprintf("token-%d", teacher.Id)
+	token, err := auth.GenerateToken(teacher.Id)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"status":  false,
+			"message": "Ошибка генерации токена",
+		})
+	}
 
 	return c.JSON(fiber.Map{
 		"status":  true,

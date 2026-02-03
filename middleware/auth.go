@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"strconv"
+	"sckool/auth"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -35,15 +35,7 @@ func AuthRequired() fiber.Handler {
 			})
 		}
 
-		tokenParts := strings.Split(token, "-")
-		if len(tokenParts) != 2 || tokenParts[0] != "token" {
-			return c.Status(401).JSON(fiber.Map{
-				"status":  false,
-				"message": "Невалидный формат токена",
-			})
-		}
-
-		teacherID, err := strconv.Atoi(tokenParts[1])
+		teacherID, err := auth.ValidateToken(token)
 		if err != nil {
 			return c.Status(401).JSON(fiber.Map{
 				"status":  false,
@@ -51,7 +43,6 @@ func AuthRequired() fiber.Handler {
 			})
 		}
 
-		c.Locals("token", token)
 		c.Locals("teacher_id", teacherID)
 
 		return c.Next()
