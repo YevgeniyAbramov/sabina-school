@@ -5,6 +5,7 @@ go 1.23.0
 require (
 	github.com/elastic/go-elasticsearch/v8 v8.19.1
 	github.com/gofiber/fiber/v2 v2.52.9
+	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
