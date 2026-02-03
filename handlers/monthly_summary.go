@@ -29,14 +29,8 @@ func GetMonthlySummary(c *fiber.Ctx) error {
 	data, err := service.GetMonthlySummary(c.Context(), teacherID, year, month)
 	if err != nil {
 		return c.JSON(fiber.Map{
-			"status":  true,
+			"status":  false,
 			"message": "Месячный итог не найден",
-			"data": fiber.Map{
-				"teacher_id":   teacherID,
-				"year":         year,
-				"month":        month,
-				"total_amount": 0,
-			},
 		})
 	}
 
