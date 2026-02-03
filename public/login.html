@@ -12,6 +12,12 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
         /* Единая цветовая система */
@@ -22,6 +28,8 @@
           var(--accent-start),
           var(--accent-end)
         );
+        --font-accent:
+          "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
       }
 
       body {
@@ -44,6 +52,10 @@
         color: white;
         padding: 2rem;
         text-align: center;
+        font-family: var(--font-accent);
+      }
+      .login-header h2 {
+        font-weight: 700;
       }
       .login-header i {
         font-size: 3rem;
@@ -61,6 +73,7 @@
         border: none;
         padding: 0.75rem;
         font-weight: 600;
+        font-family: var(--font-accent);
         transition:
           transform 0.2s,
           box-shadow 0.2s;

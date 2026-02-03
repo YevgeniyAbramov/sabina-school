@@ -598,6 +598,7 @@ function initCharts() {
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        resizeDelay: 200,
         plugins: {
           legend: {
             display: false,
@@ -635,6 +636,7 @@ function initCharts() {
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        resizeDelay: 200,
         plugins: {
           legend: {
             position: "bottom",
@@ -663,6 +665,7 @@ function initCharts() {
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        resizeDelay: 200,
         plugins: {
           legend: {
             display: false,
@@ -762,12 +765,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const summaryModal = document.getElementById("summaryModal");
   if (summaryModal) {
     summaryModal.addEventListener("shown.bs.modal", () => {
-      if (!monthlyChart) {
-        initCharts();
-      }
+      // Ждём завершения анимации модалки, чтобы не было мерцания
       setTimeout(() => {
+        if (!monthlyChart) {
+          initCharts();
+        }
+        if (monthlyChart) monthlyChart.resize();
+        if (statusChart) statusChart.resize();
+        if (lessonsChart) lessonsChart.resize();
         loadChartsData();
-      }, 100);
+      }, 350);
     });
   }
 });
