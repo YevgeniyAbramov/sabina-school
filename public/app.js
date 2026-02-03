@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupPaidToggle("addPaidToggle", "addIsPaid");
   setupPaidToggle("editPaidToggle", "editIsPaid");
   const paymentQuickButtons = document.querySelectorAll(
-    "[data-payment-filter]"
+    "[data-payment-filter]",
   );
 
   if (paymentQuickButtons.length) {
@@ -39,7 +39,14 @@ function checkAuth() {
 
   const teacherName = localStorage.getItem("teacher_name");
   if (teacherName) {
-    document.getElementById("teacherNameText").textContent = teacherName;
+    const nameElement = document.getElementById("teacherNameText");
+    const modalNameElement = document.getElementById("userModalName");
+    if (nameElement) {
+      nameElement.textContent = teacherName;
+    }
+    if (modalNameElement) {
+      modalNameElement.textContent = teacherName;
+    }
   }
 }
 
@@ -223,12 +230,12 @@ function displayGridStudents(students) {
                 </div>
                 <div class="card-footer text-muted small">
                     Создан: ${new Date(student.created_at).toLocaleDateString(
-                      "ru-RU"
+                      "ru-RU",
                     )}
                 </div>
             </div>
         </div>
-    `
+    `,
     )
     .join("");
 }
@@ -240,7 +247,7 @@ async function addStudent() {
     middle_name: document.getElementById("addMiddleName").value,
     total_lessons: parseInt(document.getElementById("addTotalLessons").value),
     remaining_lessons: parseInt(
-      document.getElementById("addTotalLessons").value
+      document.getElementById("addTotalLessons").value,
     ),
     paid_amount: parseInt(document.getElementById("addPaidAmount").value),
     missed_classes: 0,
@@ -259,7 +266,7 @@ async function addStudent() {
     if (data.status) {
       showNotification("Студент успешно добавлен!", "success");
       bootstrap.Modal.getInstance(
-        document.getElementById("addStudentModal")
+        document.getElementById("addStudentModal"),
       ).hide();
       document.getElementById("addStudentForm").reset();
       setPaidValue("addIsPaid", false);
@@ -312,11 +319,11 @@ async function updateStudent() {
     middle_name: document.getElementById("editMiddleName").value,
     total_lessons: parseInt(document.getElementById("editTotalLessons").value),
     remaining_lessons: parseInt(
-      document.getElementById("editRemainingLessons").value
+      document.getElementById("editRemainingLessons").value,
     ),
     paid_amount: parseInt(document.getElementById("editPaidAmount").value),
     missed_classes: parseInt(
-      document.getElementById("editMissedClasses").value
+      document.getElementById("editMissedClasses").value,
     ),
     is_paid: document.getElementById("editIsPaid").value === "true",
   };
@@ -324,7 +331,7 @@ async function updateStudent() {
   await submitStudentUpdate(id, student, {
     onSuccess: () => {
       bootstrap.Modal.getInstance(
-        document.getElementById("editStudentModal")
+        document.getElementById("editStudentModal"),
       ).hide();
     },
   });
@@ -418,7 +425,7 @@ async function confirmDelete() {
     if (data.status) {
       showNotification("Студент удален!", "info");
       bootstrap.Modal.getInstance(
-        document.getElementById("deleteConfirmModal")
+        document.getElementById("deleteConfirmModal"),
       ).hide();
       loadStudents();
     } else {
@@ -464,5 +471,89 @@ function setPaidValue(inputId, value) {
   input.value = value ? "true" : "false";
   if (paidToggleRegistry[inputId]) {
     paidToggleRegistry[inputId]();
+  }
+}
+
+const monthNames = [
+  "Январь",
+  "Февраль",
+  "Март",
+  "Апрель",
+  "Май",
+  "Июнь",
+  "Июль",
+  "Август",
+  "Сентябрь",
+  "Октябрь",
+  "Ноябрь",
+  "Декабрь",
+];
+
+function formatNumber(num) {
+  if (num === null || num === undefined || isNaN(num)) {
+    return "0";
+  }
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
+async function loadMonthlySummary() {
+  const summaryLabel = document.getElementById("monthlySummaryLabel");
+  const summaryAmount = document.getElementById("monthlySummaryAmount");
+
+  if (!summaryLabel || !summaryAmount) {
+    return;
+  }
+
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const monthName = monthNames[month - 1];
+
+  // Сразу показываем текущий месяц
+  summaryLabel.textContent = `За ${monthName}`;
+  summaryAmount.textContent = "0₸";
+
+  try {
+    const response = await fetch(
+      `${API_URL}/monthly-summary?year=${year}&month=${month}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+
+    if (response.status === 401) {
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("teacher_name");
+      window.location.href = "/login.html";
+      return;
+    }
+
+    let amount = 0;
+
+    if (response.ok) {
+      try {
+        const data = await response.json();
+
+        if (data.status && data.data) {
+          if (typeof data.data.total_amount === "number") {
+            amount = data.data.total_amount;
+          } else if (data.data.total_amount !== undefined) {
+            amount = parseInt(data.data.total_amount) || 0;
+          }
+        }
+      } catch (jsonError) {
+        console.error("Ошибка парсинга JSON:", jsonError);
+      }
+    } else {
+      console.warn(`HTTP error! status: ${response.status}`);
+    }
+
+    const formattedAmount = formatNumber(amount);
+    summaryLabel.textContent = `За ${monthName}`;
+    summaryAmount.textContent = `${formattedAmount}₸`;
+  } catch (error) {
+    console.error("Ошибка загрузки месячной сводки:", error);
+    summaryLabel.textContent = `За ${monthName}`;
+    summaryAmount.textContent = "0₸";
   }
 }

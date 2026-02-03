@@ -13,6 +13,11 @@ func CreateStudent(ctx context.Context, student models.Student) (*models.Student
 	if err != nil {
 		return nil, err
 	}
+
+	if student.IsPaid && student.PaidAmount > 0 {
+		go AddPaymentToMonthlySummary(ctx, student.TeacherID, student.PaidAmount)
+	}
+
 	go logger.Log("create_student", student.TeacherID, &result.Id, "success", "Студент создан")
 	return result, nil
 }
@@ -46,9 +51,19 @@ func DeleteStudent(ctx context.Context, id int, teacherID int) error {
 }
 
 func UpdateStudent(ctx context.Context, id int, teacherID int, student models.Student) (*models.Student, error) {
+
+	oldStudent, err := db.GetStudentForId(ctx, id, teacherID)
+	if err != nil {
+		return nil, err
+	}
 	result, err := db.UpdateStudent(ctx, id, teacherID, student)
 	if err != nil {
 		return nil, err
+	}
+
+	if student.IsPaid && student.PaidAmount > oldStudent.PaidAmount {
+		diff := student.PaidAmount - oldStudent.PaidAmount
+		go AddPaymentToMonthlySummaryByDate(ctx, teacherID, diff, result.UpdatedAt)
 	}
 
 	go logger.Log("update_student", teacherID, &id, "success", "Студент обновлен")
