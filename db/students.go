@@ -5,8 +5,25 @@ import (
 	"sckool/models"
 )
 
-func CreateStudent(ctx context.Context, student models.Student) (*models.Student, error) {
-	db := GetDB()
+type StudentRepository interface {
+	CreateStudent(ctx context.Context, student models.Student) (*models.Student, error)
+	GetStudent(ctx context.Context, teacherID int, isPaid *bool) ([]models.Student, error)
+	GetStudentForId(ctx context.Context, id int, teacherID int) (*models.Student, error)
+	DeleteStudent(ctx context.Context, id int, teacherID int) error
+	UpdateStudent(ctx context.Context, id int, teacherID int, student models.Student) (*models.Student, error)
+	CompleteLesson(ctx context.Context, lesson, id, paid, teacherID int, isPaid bool) error
+	MarkMissed(ctx context.Context, id int, missedCount int, teacherID int) error
+}
+
+type StudentRepo struct {
+	db *Database
+}
+
+func NewStudentRepository(db *Database) *StudentRepo {
+	return &StudentRepo{db: db}
+}
+
+func (r *StudentRepo) CreateStudent(ctx context.Context, student models.Student) (*models.Student, error) {
 
 	query := `
 		INSERT INTO auth.student (teacher_id, first_name, last_name, middle_name, total_lessons, 
@@ -18,7 +35,7 @@ func CreateStudent(ctx context.Context, student models.Student) (*models.Student
 
 	var result models.Student
 
-	err := db.QueryRowxContext(ctx, query,
+	err := r.db.conn.QueryRowxContext(ctx, query,
 		student.TeacherID,
 		student.FirstName,
 		student.LastName,
@@ -37,9 +54,7 @@ func CreateStudent(ctx context.Context, student models.Student) (*models.Student
 	return &result, nil
 }
 
-func GetStudent(ctx context.Context, teacherID int, isPaid *bool) ([]models.Student, error) {
-	db := GetDB()
-
+func (r *StudentRepo) GetStudent(ctx context.Context, teacherID int, isPaid *bool) ([]models.Student, error) {
 	query := `SELECT * FROM auth.student WHERE teacher_id = $1 AND deleted_at IS NULL`
 
 	var result []models.Student
@@ -47,10 +62,10 @@ func GetStudent(ctx context.Context, teacherID int, isPaid *bool) ([]models.Stud
 
 	if isPaid != nil {
 		query += " AND is_paid = $2 ORDER BY created_at DESC"
-		err = db.SelectContext(ctx, &result, query, teacherID, *isPaid)
+		err = r.db.conn.SelectContext(ctx, &result, query, teacherID, *isPaid)
 	} else {
 		query += " ORDER BY created_at DESC"
-		err = db.SelectContext(ctx, &result, query, teacherID)
+		err = r.db.conn.SelectContext(ctx, &result, query, teacherID)
 	}
 
 	if err != nil {
@@ -60,14 +75,13 @@ func GetStudent(ctx context.Context, teacherID int, isPaid *bool) ([]models.Stud
 	return result, nil
 }
 
-func GetStudentForId(ctx context.Context, id int, teacherID int) (*models.Student, error) {
-	db := GetDB()
+func (r *StudentRepo) GetStudentForId(ctx context.Context, id int, teacherID int) (*models.Student, error) {
 
 	query := `SELECT * FROM auth.student WHERE id = $1 AND teacher_id = $2 AND deleted_at IS NULL`
 
 	var result models.Student
 
-	err := db.GetContext(ctx, &result, query, id, teacherID)
+	err := r.db.conn.GetContext(ctx, &result, query, id, teacherID)
 	if err != nil {
 		return nil, err
 	}
@@ -75,12 +89,10 @@ func GetStudentForId(ctx context.Context, id int, teacherID int) (*models.Studen
 	return &result, nil
 }
 
-func DeleteStudent(ctx context.Context, id int, teacherID int) error {
-	db := GetDB()
-
+func (r *StudentRepo) DeleteStudent(ctx context.Context, id int, teacherID int) error {
 	query := `UPDATE auth.student SET deleted_at = NOW() WHERE id = $1 AND teacher_id = $2 AND deleted_at IS NULL`
 
-	_, err := db.ExecContext(ctx, query, id, teacherID)
+	_, err := r.db.conn.ExecContext(ctx, query, id, teacherID)
 	if err != nil {
 		return err
 	}
@@ -88,9 +100,7 @@ func DeleteStudent(ctx context.Context, id int, teacherID int) error {
 	return nil
 }
 
-func UpdateStudent(ctx context.Context, id int, teacherID int, student models.Student) (*models.Student, error) {
-	db := GetDB()
-
+func (r *StudentRepo) UpdateStudent(ctx context.Context, id int, teacherID int, student models.Student) (*models.Student, error) {
 	query := `
 		UPDATE auth.student 
 		SET first_name = $1, last_name = $2, middle_name = $3, total_lessons = $4, 
@@ -103,7 +113,7 @@ func UpdateStudent(ctx context.Context, id int, teacherID int, student models.St
 
 	var result models.Student
 
-	err := db.QueryRowxContext(ctx, query,
+	err := r.db.conn.QueryRowxContext(ctx, query,
 		student.FirstName,
 		student.LastName,
 		student.MiddleName,
@@ -122,13 +132,12 @@ func UpdateStudent(ctx context.Context, id int, teacherID int, student models.St
 	return &result, nil
 }
 
-func CompleteLesson(ctx context.Context, lesson, id, paid, teacherID int, isPaid bool) error {
-	db := GetDB()
+func (r *StudentRepo) CompleteLesson(ctx context.Context, lesson, id, paid, teacherID int, isPaid bool) error {
 	query := `UPDATE auth.student 
 		SET remaining_lessons = $1, paid_amount = $2, is_paid = $3, updated_at = NOW() 
 		WHERE id = $4 AND teacher_id = $5 AND deleted_at IS NULL`
 
-	_, err := db.ExecContext(ctx, query, lesson, paid, isPaid, id, teacherID)
+	_, err := r.db.conn.ExecContext(ctx, query, lesson, paid, isPaid, id, teacherID)
 	if err != nil {
 		return err
 	}
@@ -136,11 +145,10 @@ func CompleteLesson(ctx context.Context, lesson, id, paid, teacherID int, isPaid
 	return nil
 }
 
-func MarkMissed(ctx context.Context, id int, missedCount int, teacherID int) error {
-	db := GetDB()
+func (r *StudentRepo) MarkMissed(ctx context.Context, id int, missedCount int, teacherID int) error {
 	query := `UPDATE auth.student SET missed_classes = $1, updated_at = NOW() WHERE id = $2 AND teacher_id = $3 AND deleted_at IS NULL`
 
-	_, err := db.ExecContext(ctx, query, missedCount, id, teacherID)
+	_, err := r.db.conn.ExecContext(ctx, query, missedCount, id, teacherID)
 	if err != nil {
 		return err
 	}

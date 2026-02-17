@@ -8,22 +8,34 @@ import (
 	"sckool/models"
 )
 
-func CreateStudent(ctx context.Context, student models.Student) (*models.Student, error) {
-	result, err := db.CreateStudent(ctx, student)
+type StudentService struct {
+	repo                  db.StudentRepository
+	monthlySummaryService *MonthlySummaryService
+}
+
+func NewStudentService(repo db.StudentRepository, monthlySummaryService *MonthlySummaryService) *StudentService {
+	return &StudentService{
+		repo:                  repo,
+		monthlySummaryService: monthlySummaryService,
+	}
+}
+
+func (s *StudentService) CreateStudent(ctx context.Context, student models.Student) (*models.Student, error) {
+	result, err := s.repo.CreateStudent(ctx, student)
 	if err != nil {
 		return nil, err
 	}
 
 	if student.IsPaid && student.PaidAmount > 0 {
-		go AddPaymentToMonthlySummary(ctx, student.TeacherID, student.PaidAmount)
+		go s.monthlySummaryService.AddPaymentToMonthlySummary(ctx, student.TeacherID, student.PaidAmount)
 	}
 
 	go logger.Log("create_student", student.TeacherID, &result.Id, "success", "Студент создан")
 	return result, nil
 }
 
-func GetStudent(ctx context.Context, teacherID int, isPaid *bool) ([]models.Student, error) {
-	result, err := db.GetStudent(ctx, teacherID, isPaid)
+func (s *StudentService) GetStudent(ctx context.Context, teacherID int, isPaid *bool) ([]models.Student, error) {
+	result, err := s.repo.GetStudent(ctx, teacherID, isPaid)
 	if err != nil {
 		return nil, err
 	}
@@ -31,8 +43,8 @@ func GetStudent(ctx context.Context, teacherID int, isPaid *bool) ([]models.Stud
 	return result, err
 }
 
-func GetStudentForId(ctx context.Context, id int, teacherID int) (*models.Student, error) {
-	result, err := db.GetStudentForId(ctx, id, teacherID)
+func (s *StudentService) GetStudentForId(ctx context.Context, id int, teacherID int) (*models.Student, error) {
+	result, err := s.repo.GetStudentForId(ctx, id, teacherID)
 	if err != nil {
 		return nil, err
 	}
@@ -40,8 +52,8 @@ func GetStudentForId(ctx context.Context, id int, teacherID int) (*models.Studen
 	return result, err
 }
 
-func DeleteStudent(ctx context.Context, id int, teacherID int) error {
-	err := db.DeleteStudent(ctx, id, teacherID)
+func (s *StudentService) DeleteStudent(ctx context.Context, id int, teacherID int) error {
+	err := s.repo.DeleteStudent(ctx, id, teacherID)
 	if err != nil {
 		return err
 	}
@@ -50,28 +62,28 @@ func DeleteStudent(ctx context.Context, id int, teacherID int) error {
 	return nil
 }
 
-func UpdateStudent(ctx context.Context, id int, teacherID int, student models.Student) (*models.Student, error) {
+func (s *StudentService) UpdateStudent(ctx context.Context, id int, teacherID int, student models.Student) (*models.Student, error) {
 
-	oldStudent, err := db.GetStudentForId(ctx, id, teacherID)
+	oldStudent, err := s.repo.GetStudentForId(ctx, id, teacherID)
 	if err != nil {
 		return nil, err
 	}
-	result, err := db.UpdateStudent(ctx, id, teacherID, student)
+	result, err := s.repo.UpdateStudent(ctx, id, teacherID, student)
 	if err != nil {
 		return nil, err
 	}
 
 	if student.IsPaid && student.PaidAmount > oldStudent.PaidAmount {
 		diff := student.PaidAmount - oldStudent.PaidAmount
-		go AddPaymentToMonthlySummaryByDate(ctx, teacherID, diff, result.UpdatedAt)
+		go s.monthlySummaryService.AddPaymentToMonthlySummaryByDate(ctx, teacherID, diff, result.UpdatedAt)
 	}
 
 	go logger.Log("update_student", teacherID, &id, "success", "Студент обновлен")
 	return result, nil
 }
 
-func CompleteLesson(ctx context.Context, id int, teacherID int) error {
-	resp, err := db.GetStudentForId(ctx, id, teacherID)
+func (s *StudentService) CompleteLesson(ctx context.Context, id int, teacherID int) error {
+	resp, err := s.repo.GetStudentForId(ctx, id, teacherID)
 	if err != nil {
 		return err
 	}
@@ -98,7 +110,7 @@ func CompleteLesson(ctx context.Context, id int, teacherID int) error {
 		newIsPaid = false
 	}
 
-	err = db.CompleteLesson(ctx, newRemaining, id, newPaidAmount, teacherID, newIsPaid)
+	err = s.repo.CompleteLesson(ctx, newRemaining, id, newPaidAmount, teacherID, newIsPaid)
 	if err != nil {
 		return err
 	}
@@ -107,15 +119,15 @@ func CompleteLesson(ctx context.Context, id int, teacherID int) error {
 	return nil
 }
 
-func MarkMissed(ctx context.Context, id int, teacherID int) error {
-	student, err := db.GetStudentForId(ctx, id, teacherID)
+func (s *StudentService) MarkMissed(ctx context.Context, id int, teacherID int) error {
+	student, err := s.repo.GetStudentForId(ctx, id, teacherID)
 	if err != nil {
 		return err
 	}
 
 	newMissedCount := student.MissedClasses + 1
 
-	err = db.MarkMissed(ctx, id, newMissedCount, teacherID)
+	err = s.repo.MarkMissed(ctx, id, newMissedCount, teacherID)
 	if err != nil {
 		return err
 	}

@@ -7,7 +7,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetMonthlySummary(c *fiber.Ctx) error {
+type MonthlySummaryHandler struct {
+	service *service.MonthlySummaryService
+}
+
+func NewMonthlySummaryHandler(service *service.MonthlySummaryService) *MonthlySummaryHandler {
+	return &MonthlySummaryHandler{service: service}
+}
+
+func (h *MonthlySummaryHandler) GetMonthlySummary(c *fiber.Ctx) error {
 	teacherID := middleware.GetTeacherID(c)
 	year := c.QueryInt("year")
 	month := c.QueryInt("month")
@@ -26,7 +34,7 @@ func GetMonthlySummary(c *fiber.Ctx) error {
 		})
 	}
 
-	data, err := service.GetMonthlySummary(c.Context(), teacherID, year, month)
+	data, err := h.service.GetMonthlySummary(c.Context(), teacherID, year, month)
 	if err != nil {
 		return c.JSON(fiber.Map{
 			"status":  false,

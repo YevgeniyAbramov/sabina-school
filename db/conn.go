@@ -11,17 +11,16 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var conn *sqlx.DB
-
-func GetDB() *sqlx.DB {
-	return conn
+type Database struct {
+	conn *sqlx.DB
 }
 
-func InitDB() {
+func InitDB() (*Database, error) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("Warning: .env file not found in InitDB, using environment variables")
 	}
+
 	username := os.Getenv("db_user")
 	password := os.Getenv("db_password")
 	dbName := os.Getenv("db_name")
@@ -35,7 +34,13 @@ func InitDB() {
 	if err != nil {
 		log.Fatal("error connecting to database:", err)
 	}
+
 	log.Println("DB connection is established =)")
 
-	conn = db
+	return &Database{conn: db}, nil
+
+}
+
+func (d *Database) Close() error {
+	return d.conn.Close()
 }

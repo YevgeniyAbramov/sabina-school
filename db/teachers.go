@@ -5,15 +5,26 @@ import (
 	"sckool/models"
 )
 
-func GetTeacherByLogin(ctx context.Context, login string) (*models.Teacher, error) {
-	db := GetDB()
+type TeacherRepository interface {
+	GetTeacherByLogin(ctx context.Context, login string) (*models.Teacher, error)
+	GetTeacherByID(ctx context.Context, id int) (*models.Teacher, error)
+}
 
+type TeacherRepo struct {
+	db *Database
+}
+
+func NewTeacherRepo(db *Database) *TeacherRepo {
+	return &TeacherRepo{db: db}
+}
+
+func (r *TeacherRepo) GetTeacherByLogin(ctx context.Context, login string) (*models.Teacher, error) {
 	query := `SELECT id, login, password, first_name, last_name, middle_name, created_at, updated_at 
 	          FROM auth.teacher 
 	          WHERE login = $1 AND deleted_at IS NULL`
 
 	var teacher models.Teacher
-	err := db.GetContext(ctx, &teacher, query, login)
+	err := r.db.conn.GetContext(ctx, &teacher, query, login)
 	if err != nil {
 		return nil, err
 	}
@@ -21,15 +32,13 @@ func GetTeacherByLogin(ctx context.Context, login string) (*models.Teacher, erro
 	return &teacher, nil
 }
 
-func GetTeacherByID(ctx context.Context, id int) (*models.Teacher, error) {
-	db := GetDB()
-
+func (r *TeacherRepo) GetTeacherByID(ctx context.Context, id int) (*models.Teacher, error) {
 	query := `SELECT id, login, first_name, last_name, middle_name, created_at, updated_at 
 	          FROM auth.teacher 
 	          WHERE id = $1 AND deleted_at IS NULL`
 
 	var teacher models.Teacher
-	err := db.GetContext(ctx, &teacher, query, id)
+	err := r.db.conn.GetContext(ctx, &teacher, query, id)
 	if err != nil {
 		return nil, err
 	}

@@ -1,14 +1,20 @@
 package handler
 
 import (
-	"sckool/auth"
-	"sckool/db"
-	"sckool/logger"
+	"sckool/service"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func Login(c *fiber.Ctx) error {
+type AuthHandler struct {
+	authService *service.AuthService
+}
+
+func NewAuthHandler(authService *service.AuthService) *AuthHandler {
+	return &AuthHandler{authService: authService}
+}
+
+func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	var req struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -28,28 +34,11 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	teacher, err := db.GetTeacherByLogin(c.Context(), req.Username)
+	teacher, token, err := h.authService.Login(c.Context(), req.Username, req.Password)
 	if err != nil {
 		return c.Status(401).JSON(fiber.Map{
 			"status":  false,
-			"message": "Неверный логин или пароль",
-		})
-	}
-
-	if teacher.Password != req.Password {
-		return c.Status(401).JSON(fiber.Map{
-			"status":  false,
-			"message": "Неверный логин или пароль",
-		})
-	}
-
-	go logger.Log("login", teacher.Id, nil, "success", "Вход выполнен")
-
-	token, err := auth.GenerateToken(teacher.Id)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"status":  false,
-			"message": "Ошибка генерации токена",
+			"message": err.Error(),
 		})
 	}
 

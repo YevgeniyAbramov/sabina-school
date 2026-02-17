@@ -9,7 +9,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func CreateStudent(c *fiber.Ctx) error {
+type StudentHandler struct {
+	service *service.StudentService
+}
+
+func NewStudentHandler(service *service.StudentService) *StudentHandler {
+	return &StudentHandler{service: service}
+}
+
+func (h *StudentHandler) CreateStudent(c *fiber.Ctx) error {
 	teacherID := middleware.GetTeacherID(c)
 
 	var req models.Student
@@ -23,7 +31,7 @@ func CreateStudent(c *fiber.Ctx) error {
 
 	req.TeacherID = teacherID
 
-	resp, err := service.CreateStudent(c.Context(), req)
+	resp, err := h.service.CreateStudent(c.Context(), req)
 	if err != nil {
 		return c.JSON(fiber.Map{
 			"status":  false,
@@ -38,7 +46,7 @@ func CreateStudent(c *fiber.Ctx) error {
 	})
 }
 
-func GetStudents(c *fiber.Ctx) error {
+func (h *StudentHandler) GetStudents(c *fiber.Ctx) error {
 	teacherID := middleware.GetTeacherID(c)
 	param := c.Query("is_paid")
 
@@ -54,7 +62,7 @@ func GetStudents(c *fiber.Ctx) error {
 		isPaid = &paramBool
 	}
 
-	resp, err := service.GetStudent(c.Context(), teacherID, isPaid)
+	resp, err := h.service.GetStudent(c.Context(), teacherID, isPaid)
 	if err != nil {
 		return c.JSON(fiber.Map{
 			"status":  false,
@@ -68,7 +76,7 @@ func GetStudents(c *fiber.Ctx) error {
 	})
 }
 
-func GetStudent(c *fiber.Ctx) error {
+func (h *StudentHandler) GetStudent(c *fiber.Ctx) error {
 	teacherID := middleware.GetTeacherID(c)
 
 	idParam := c.Params("id")
@@ -80,7 +88,7 @@ func GetStudent(c *fiber.Ctx) error {
 		})
 	}
 
-	resp, err := service.GetStudentForId(c.Context(), id, teacherID)
+	resp, err := h.service.GetStudentForId(c.Context(), id, teacherID)
 	if err != nil {
 		return c.JSON(fiber.Map{
 			"status":  false,
@@ -94,7 +102,7 @@ func GetStudent(c *fiber.Ctx) error {
 	})
 }
 
-func DeleteStudent(c *fiber.Ctx) error {
+func (h *StudentHandler) DeleteStudent(c *fiber.Ctx) error {
 	teacherID := middleware.GetTeacherID(c)
 
 	idParam := c.Params("id")
@@ -106,7 +114,7 @@ func DeleteStudent(c *fiber.Ctx) error {
 		})
 	}
 
-	err = service.DeleteStudent(c.Context(), id, teacherID)
+	err = h.service.DeleteStudent(c.Context(), id, teacherID)
 	if err != nil {
 		return c.JSON(fiber.Map{
 			"status":  false,
@@ -120,7 +128,7 @@ func DeleteStudent(c *fiber.Ctx) error {
 
 }
 
-func UpdateStudent(c *fiber.Ctx) error {
+func (h *StudentHandler) UpdateStudent(c *fiber.Ctx) error {
 	teacherID := middleware.GetTeacherID(c)
 
 	idParam := c.Params("id")
@@ -141,7 +149,7 @@ func UpdateStudent(c *fiber.Ctx) error {
 		})
 	}
 
-	resp, err := service.UpdateStudent(c.Context(), id, teacherID, req)
+	resp, err := h.service.UpdateStudent(c.Context(), id, teacherID, req)
 	if err != nil {
 		return c.JSON(fiber.Map{
 			"status":  false,
@@ -155,7 +163,7 @@ func UpdateStudent(c *fiber.Ctx) error {
 	})
 }
 
-func CompleteLesson(c *fiber.Ctx) error {
+func (h *StudentHandler) CompleteLesson(c *fiber.Ctx) error {
 	teacherID := middleware.GetTeacherID(c)
 
 	idParam := c.Params("id")
@@ -167,7 +175,7 @@ func CompleteLesson(c *fiber.Ctx) error {
 		})
 	}
 
-	err = service.CompleteLesson(c.Context(), id, teacherID)
+	err = h.service.CompleteLesson(c.Context(), id, teacherID)
 	if err != nil {
 		return c.JSON(fiber.Map{
 			"status":  false,
@@ -181,7 +189,7 @@ func CompleteLesson(c *fiber.Ctx) error {
 	})
 }
 
-func MarkMissed(c *fiber.Ctx) error {
+func (h *StudentHandler) MarkMissed(c *fiber.Ctx) error {
 	teacherID := middleware.GetTeacherID(c)
 
 	idParam := c.Params("id")
@@ -193,7 +201,7 @@ func MarkMissed(c *fiber.Ctx) error {
 		})
 	}
 
-	err = service.MarkMissed(c.Context(), id, teacherID)
+	err = h.service.MarkMissed(c.Context(), id, teacherID)
 	if err != nil {
 		return c.JSON(fiber.Map{
 			"status":  false,
