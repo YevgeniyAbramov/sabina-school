@@ -5,8 +5,21 @@ import (
 	"sckool/models"
 )
 
-func AddToMonthlySummary(ctx context.Context, teacherID, year, month, amount int) error {
-	db := GetDB()
+type MonthlySummaryRepository interface {
+	AddToMonthlySummary(ctx context.Context, teacherID, year, month, amount int) error
+	GetMonthlySummary(ctx context.Context, teacherID, year, month int) (*models.MonthlySummary, error)
+	GetMonthlySummaries(ctx context.Context, teacherID, year int) ([]models.MonthlySummary, error)
+}
+
+type MonthlySummaryRepo struct {
+	db *Database
+}
+
+func NewMonthlySummaryRepo(db *Database) *MonthlySummaryRepo {
+	return &MonthlySummaryRepo{db: db}
+}
+
+func (r *MonthlySummaryRepo) AddToMonthlySummary(ctx context.Context, teacherID, year, month, amount int) error {
 
 	query := `
 		INSERT INTO auth.monthly_summary (teacher_id, year, month, total_amount, created_at, updated_at)
@@ -16,7 +29,7 @@ func AddToMonthlySummary(ctx context.Context, teacherID, year, month, amount int
 			total_amount = auth.monthly_summary.total_amount + EXCLUDED.total_amount,
 			updated_at = NOW()
 	`
-	_, err := db.ExecContext(ctx, query, teacherID, year, month, amount)
+	_, err := r.db.conn.ExecContext(ctx, query, teacherID, year, month, amount)
 	if err != nil {
 		return err
 	}
@@ -24,8 +37,7 @@ func AddToMonthlySummary(ctx context.Context, teacherID, year, month, amount int
 	return nil
 }
 
-func GetMonthlySummary(ctx context.Context, teacherID, year, month int) (*models.MonthlySummary, error) {
-	db := GetDB()
+func (r *MonthlySummaryRepo) GetMonthlySummary(ctx context.Context, teacherID, year, month int) (*models.MonthlySummary, error) {
 	var result models.MonthlySummary
 
 	query := `
@@ -35,7 +47,7 @@ func GetMonthlySummary(ctx context.Context, teacherID, year, month int) (*models
 		AND month = $3
 	`
 
-	err := db.GetContext(ctx, &result, query, teacherID, year, month)
+	err := r.db.conn.GetContext(ctx, &result, query, teacherID, year, month)
 	if err != nil {
 		return nil, err
 	}
@@ -43,9 +55,7 @@ func GetMonthlySummary(ctx context.Context, teacherID, year, month int) (*models
 	return &result, nil
 }
 
-func GetMonthlySummaries(ctx context.Context, teacherID, year int) ([]models.MonthlySummary, error) {
-	db := GetDB()
-
+func (r *MonthlySummaryRepo) GetMonthlySummaries(ctx context.Context, teacherID, year int) ([]models.MonthlySummary, error) {
 	var result []models.MonthlySummary
 	query := `
 		SELECT * FROM auth.monthly_summary
@@ -54,7 +64,7 @@ func GetMonthlySummaries(ctx context.Context, teacherID, year int) ([]models.Mon
 		ORDER BY month ASC
 	`
 
-	err := db.SelectContext(ctx, &result, query, teacherID, year)
+	err := r.db.conn.SelectContext(ctx, &result, query, teacherID, year)
 	if err != nil {
 		return nil, err
 	}

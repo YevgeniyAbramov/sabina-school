@@ -7,23 +7,31 @@ import (
 	"time"
 )
 
-func AddPaymentToMonthlySummary(ctx context.Context, teacherID, amount int) error {
+type MonthlySummaryService struct {
+	repo db.MonthlySummaryRepository
+}
+
+func NewMonthlySummaryService(repo db.MonthlySummaryRepository) *MonthlySummaryService {
+	return &MonthlySummaryService{repo: repo}
+}
+
+func (s *MonthlySummaryService) AddPaymentToMonthlySummary(ctx context.Context, teacherID, amount int) error {
 	now := time.Now()
 	year := now.Year()
 	month := int(now.Month())
 
-	return db.AddToMonthlySummary(ctx, teacherID, year, month, amount)
+	return s.repo.AddToMonthlySummary(ctx, teacherID, year, month, amount)
 }
 
-func AddPaymentToMonthlySummaryByDate(ctx context.Context, teacherID, amount int, date time.Time) error {
+func (s *MonthlySummaryService) AddPaymentToMonthlySummaryByDate(ctx context.Context, teacherID, amount int, date time.Time) error {
 	year := date.Year()
 	month := int(date.Month())
 
-	return db.AddToMonthlySummary(ctx, teacherID, year, month, amount)
+	return s.repo.AddToMonthlySummary(ctx, teacherID, year, month, amount)
 }
 
-func GetMonthlySummary(ctx context.Context, teacherID, year, month int) (*models.MonthlySummary, error) {
-	result, err := db.GetMonthlySummary(ctx, teacherID, year, month)
+func (s *MonthlySummaryService) GetMonthlySummary(ctx context.Context, teacherID, year, month int) (*models.MonthlySummary, error) {
+	result, err := s.repo.GetMonthlySummary(ctx, teacherID, year, month)
 	if err != nil {
 		return result, err
 	}

@@ -7,21 +7,23 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func Use(app *fiber.App) {
-	api := app.Group("/api/v1/")
+func Use(app *fiber.App, studentHandler *handler.StudentHandler, authHandler *handler.AuthHandler, monthlySummaryHandler *handler.MonthlySummaryHandler) {
 
+	api := app.Group("/api/v1/")
 	// Публичные роуты (без авторизации)
 	api.Get("/status", handler.CheckStatus)
-	api.Post("/auth/login", handler.Login)
+	api.Post("/auth/login", authHandler.Login)
 
 	// Защищенные роуты (требуют токен)
 	protected := api.Group("/", middleware.AuthRequired())
-	protected.Post("/students", handler.CreateStudent)
-	protected.Get("/students", handler.GetStudents)
-	protected.Get("/student/:id", handler.GetStudent)
-	protected.Delete("/student/:id", handler.DeleteStudent)
-	protected.Put("/student/:id", handler.UpdateStudent)
-	protected.Post("/student/:id/complete-lesson", handler.CompleteLesson)
-	protected.Post("/student/:id/mark-missed", handler.MarkMissed)
-	protected.Get("/monthly-summary", handler.GetMonthlySummary)
+
+	protected.Post("/students", studentHandler.CreateStudent)
+	protected.Get("/students", studentHandler.GetStudents)
+	protected.Get("/student/:id", studentHandler.GetStudent)
+	protected.Delete("/student/:id", studentHandler.DeleteStudent)
+	protected.Put("/student/:id", studentHandler.UpdateStudent)
+	protected.Post("/student/:id/complete-lesson", studentHandler.CompleteLesson)
+	protected.Post("/student/:id/mark-missed", studentHandler.MarkMissed)
+
+	protected.Get("/monthly-summary", monthlySummaryHandler.GetMonthlySummary)
 }

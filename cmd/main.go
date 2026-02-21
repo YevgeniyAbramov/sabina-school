@@ -5,8 +5,10 @@ import (
 	"os"
 	"sckool/auth"
 	"sckool/db"
+	handler "sckool/handlers"
 	eslogger "sckool/logger"
 	"sckool/routes"
+	"sckool/service"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -22,7 +24,16 @@ func main() {
 		log.Fatal("Failed to initialize auth:", err)
 	}
 
-	db.InitDB()
+	database, err := db.InitDB()
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
+
+	defer database.Close()
+
+	repos := db.NewRepositories(database)
+	services := service.NewServices(repos)
+	handlers := handler.NewHandlers(services)
 
 	esURL := os.Getenv("ELASTICSEARCH_URL")
 	esUsername := os.Getenv("ELASTICSEARCH_USERNAME")
@@ -51,7 +62,7 @@ func main() {
 
 	app.Static("/", "./public")
 
-	routes.Use(app)
+	routes.Use(app, handlers.Student, handlers.Auth, handlers.MonthlySummary)
 
 	log.Fatal(app.Listen(":" + port))
 }
