@@ -10,6 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
   checkAuth();
   setupPaidToggle("addPaidToggle", "addIsPaid");
   setupPaidToggle("editPaidToggle", "editIsPaid");
+
+  const scheduleModal = document.getElementById("scheduleModal");
+  if (scheduleModal) {
+    scheduleModal.addEventListener("shown.bs.modal", loadTeacherSchedule);
+  }
   const paymentQuickButtons = document.querySelectorAll(
     "[data-payment-filter]",
   );
@@ -62,6 +67,279 @@ function logout() {
   localStorage.removeItem("auth_token");
   localStorage.removeItem("teacher_name");
   window.location.href = "/login.html";
+}
+
+const DAY_NAMES = [
+  "Воскресенье",
+  "Понедельник",
+  "Вторник",
+  "Среда",
+  "Четверг",
+  "Пятница",
+  "Суббота",
+];
+let studentScheduleSlots = [];
+let currentScheduleStudentId = null;
+
+async function openStudentSchedule(studentId) {
+  currentScheduleStudentId = studentId;
+  const student = allStudents.find((s) => s.id === studentId);
+  const name = student
+    ? `${student.first_name} ${student.last_name || ""}`.trim()
+    : "Ученик";
+  document.getElementById("studentScheduleModalTitle").textContent =
+    `Расписание: ${name}`;
+  document.getElementById("studentScheduleId").value = studentId;
+  document.getElementById("studentScheduleSlots").innerHTML =
+    '<div class="text-muted small">Загрузка...</div>';
+
+  try {
+    const response = await fetch(`${API_URL}/student/${studentId}/schedule`, {
+      headers: getAuthHeaders(),
+    });
+    const data = await response.json();
+    if (data.status && data.data) {
+      studentScheduleSlots = data.data.map((s) => ({
+        day_of_week: s.day_of_week,
+        time_slot: s.time_slot,
+      }));
+    } else {
+      studentScheduleSlots = [];
+    }
+  } catch (e) {
+    studentScheduleSlots = [];
+    showNotification("Ошибка загрузки расписания", "danger");
+  }
+  renderStudentScheduleSlots();
+  initSchedulePickers();
+  new bootstrap.Modal(document.getElementById("studentScheduleModal")).show();
+}
+
+function getSchedulePickerValues() {
+  const dayBtn = document.querySelector(".day-picker-btn.active");
+  const day = dayBtn ? parseInt(dayBtn.dataset.day, 10) : null;
+  const h = document.querySelector("#scheduleHoursWheel .time-wheel-item.selected");
+  const m = document.querySelector("#scheduleMinutesWheel .time-wheel-item.selected");
+  const hour = h ? h.dataset.value : "10";
+  const min = m ? m.dataset.value : "00";
+  return { day, timeSlot: `${hour.padStart(2, "0")}:${min.padStart(2, "0")}` };
+}
+
+function initSchedulePickers() {
+  const dayPicker = document.getElementById("scheduleDayPicker");
+  if (!dayPicker) return;
+  const timeSection = document.getElementById("scheduleTimeSection");
+  const addBtn = document.getElementById("scheduleAddBtn");
+  dayPicker.querySelectorAll(".day-picker-btn").forEach((btn) => {
+    btn.classList.remove("active");
+    btn.onclick = () => {
+      dayPicker.querySelectorAll(".day-picker-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      timeSection?.classList.remove("d-none");
+      addBtn?.classList.remove("d-none");
+    };
+  });
+  timeSection?.classList.add("d-none");
+  addBtn?.classList.add("d-none");
+
+  const hoursWheel = document.getElementById("scheduleHoursWheel");
+  const minutesWheel = document.getElementById("scheduleMinutesWheel");
+  if (!hoursWheel || !minutesWheel) return;
+
+  hoursWheel.innerHTML = "";
+  for (let i = 7; i <= 21; i++) {
+    const div = document.createElement("div");
+    div.className = "time-wheel-item";
+    div.dataset.value = String(i);
+    div.textContent = String(i).padStart(2, "0");
+    hoursWheel.appendChild(div);
+  }
+  minutesWheel.innerHTML = "";
+  for (let i = 0; i < 60; i += 5) {
+    const div = document.createElement("div");
+    div.className = "time-wheel-item";
+    div.dataset.value = String(i).padStart(2, "0");
+    div.textContent = String(i).padStart(2, "0");
+    minutesWheel.appendChild(div);
+  }
+
+  const itemHeight = 34;
+  const padding = 42;
+
+  const updateSelection = (wheelEl) => {
+    const items = wheelEl.querySelectorAll(".time-wheel-item");
+    const center = wheelEl.scrollTop + wheelEl.clientHeight / 2 - itemHeight / 2;
+    items.forEach((it) => it.classList.remove("selected"));
+    for (let i = 0; i < items.length; i++) {
+      const top = padding + i * itemHeight;
+      if (top <= center && center < top + itemHeight) {
+        items[i].classList.add("selected");
+        break;
+      }
+    }
+  };
+
+  const scrollToSelected = (wheelEl, value) => {
+    const items = wheelEl.querySelectorAll(".time-wheel-item");
+    const idx = Array.from(items).findIndex((it) => it.dataset.value === value);
+    if (idx >= 0) {
+      wheelEl.scrollTop = padding + idx * itemHeight - wheelEl.clientHeight / 2 + itemHeight / 2;
+    }
+    updateSelection(wheelEl);
+  };
+
+  [hoursWheel, minutesWheel].forEach((w) => {
+    w.onscroll = () => updateSelection(w);
+  });
+
+  scrollToSelected(hoursWheel, "10");
+  scrollToSelected(minutesWheel, "00");
+}
+
+function addScheduleSlot() {
+  const { day, timeSlot } = getSchedulePickerValues();
+  if (day === null) {
+    showNotification("Сначала выберите день недели", "warning");
+    return;
+  }
+  studentScheduleSlots.push({ day_of_week: day, time_slot: timeSlot });
+  saveStudentSchedule(false);
+  renderStudentScheduleSlots();
+}
+
+function removeScheduleSlot(index) {
+  studentScheduleSlots.splice(index, 1);
+  renderStudentScheduleSlots();
+}
+
+function renderStudentScheduleSlots() {
+  const container = document.getElementById("studentScheduleSlots");
+  if (studentScheduleSlots.length === 0) {
+    container.innerHTML =
+      '<div class="text-muted small">Нет слотов. Добавьте время занятий.</div>';
+    return;
+  }
+  container.innerHTML = studentScheduleSlots
+    .map(
+      (s, i) => {
+        const timeStr = (s.time_slot || "").split(":").slice(0, 2).join(":");
+        return `
+    <div class="list-group-item d-flex justify-content-between align-items-center py-2">
+      <span>${DAY_NAMES[s.day_of_week]} — <strong>${timeStr || s.time_slot}</strong></span>
+      <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeScheduleSlot(${i})">
+        <i class="bi bi-trash"></i>
+      </button>
+    </div>
+  `;
+      },
+    )
+    .join("");
+}
+
+async function saveStudentSchedule(closeModal = true) {
+  const id = document.getElementById("studentScheduleId").value;
+  if (!id) return;
+  try {
+    const response = await fetch(`${API_URL}/student/${id}/schedule`, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ slots: studentScheduleSlots }),
+    });
+    const data = await response.json();
+    if (data.status) {
+      showNotification("Расписание сохранено", "success");
+      if (closeModal) {
+        bootstrap.Modal.getInstance(
+          document.getElementById("studentScheduleModal"),
+        )?.hide();
+      }
+    } else {
+      showNotification(data.message || "Ошибка сохранения", "danger");
+    }
+  } catch (e) {
+    showNotification("Ошибка при сохранении расписания", "danger");
+    console.error(e);
+  }
+}
+
+async function loadTeacherSchedule() {
+  const container = document.getElementById("teacherScheduleContent");
+  if (!container) return;
+  container.innerHTML = '<div class="text-muted small">Загрузка...</div>';
+
+  const daySlots = {};
+  for (let d = 0; d <= 6; d++) daySlots[d] = [];
+
+  try {
+    for (let day = 0; day <= 6; day++) {
+      const resp = await fetch(`${API_URL}/schedule?day=${day}`, {
+        headers: getAuthHeaders(),
+      });
+      const data = await resp.json();
+      if (data.status && data.data) {
+        daySlots[day] = data.data;
+      }
+    }
+
+    const dayOrder = [1, 2, 3, 4, 5, 6, 0];
+    let html = '<div class="accordion teacher-schedule-accordion" id="teacherScheduleAccordion">';
+    let hasAny = false;
+
+    for (const d of dayOrder) {
+      const slots = daySlots[d] || [];
+      const dayName = DAY_NAMES[d];
+      const sortedSlots = [...slots].sort((a, b) =>
+        (a.time_slot || "").localeCompare(b.time_slot || "")
+      );
+      const count = sortedSlots.length;
+      if (count > 0) hasAny = true;
+
+      const slotsHtml =
+        count === 0
+          ? '<div class="text-muted small">На этот день записей нет</div>'
+          : sortedSlots
+              .map((s) => {
+                const student = allStudents.find((st) => st.id === s.student_id);
+                const name = student
+                  ? `${student.first_name} ${student.last_name || ""}`.trim()
+                  : `#${s.student_id}`;
+                const timeStr = (s.time_slot || "").split(":").slice(0, 2).join(":");
+                return `<div class="schedule-slot-row">
+                <span class="time-badge">${timeStr || s.time_slot}</span>
+                <span>${name}</span>
+              </div>`;
+              })
+              .join("");
+
+      const collapseId = `teacherScheduleDay${d}`;
+      const headerId = `teacherScheduleDayHeading${d}`;
+      let loadClass = "schedule-load-empty";
+      if (count >= 1 && count <= 3) loadClass = "schedule-load-ok";
+      else if (count >= 4) loadClass = "schedule-load-heavy";
+      const expanded = "false";
+      const showClass = "";
+      html += `
+        <div class="accordion-item ${loadClass}">
+          <h2 class="accordion-header" id="${headerId}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="${expanded}" aria-controls="${collapseId}">
+              <span>${dayName}</span>
+              <span class="schedule-day-count">${count}</span>
+            </button>
+          </h2>
+          <div id="${collapseId}" class="accordion-collapse collapse ${showClass}" aria-labelledby="${headerId}">
+            <div class="accordion-body">
+              ${slotsHtml}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    html += "</div>";
+    container.innerHTML = hasAny ? html : '<div class="text-muted small">Расписание пусто</div>';
+  } catch (e) {
+    container.innerHTML = '<div class="text-muted small text-danger">Ошибка загрузки</div>';
+    console.error(e);
+  }
 }
 
 function showNotification(message, type = "success") {
@@ -214,24 +492,24 @@ function displayGridStudents(students) {
                         })">
                             <i class="bi bi-x-lg"></i> Отметить пропуск
                         </button>
-                        <div class="btn-group" role="group">
-                            <button class="btn btn-outline-primary btn-sm" onclick="editStudent(${
-                              student.id
-                            })">
-                                <i class="bi bi-pencil"></i> Редактировать
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm" onclick="deleteStudent(${
-                              student.id
-                            })">
-                                <i class="bi bi-trash"></i> Удалить
-                            </button>
-                        </div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="openStudentSchedule(${
+                          student.id
+                        })">
+                            <i class="bi bi-calendar-week"></i> Расписание
+                        </button>
                     </div>
                 </div>
-                <div class="card-footer text-muted small">
-                    Создан: ${new Date(student.created_at).toLocaleDateString(
-                      "ru-RU",
-                    )}
+                <div class="card-footer d-flex justify-content-end gap-2 py-2">
+                    <button class="btn btn-outline-primary btn-sm" onclick="editStudent(${
+                      student.id
+                    })" title="Редактировать">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="deleteStudent(${
+                      student.id
+                    })" title="Удалить">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </div>
             </div>
         </div>

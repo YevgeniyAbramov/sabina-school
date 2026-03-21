@@ -62,7 +62,7 @@ func main() {
 
 	app.Static("/", "./public")
 
-	routes.Use(app, handlers.Student, handlers.Auth, handlers.MonthlySummary)
+	routes.Use(app, handlers.Student, handlers.Auth, handlers.MonthlySummary, handlers.StudentSchedule)
 
 	log.Fatal(app.Listen(":" + port))
 }
