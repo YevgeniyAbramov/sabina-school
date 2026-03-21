@@ -81,6 +81,11 @@ const DAY_NAMES = [
 let studentScheduleSlots = [];
 let currentScheduleStudentId = null;
 
+function normalizeTimeSlot(timeSlot) {
+  const [hour = "00", minute = "00"] = String(timeSlot || "").split(":");
+  return `${hour.padStart(2, "0")}:${minute.padStart(2, "0")}`;
+}
+
 async function openStudentSchedule(studentId) {
   currentScheduleStudentId = studentId;
   const student = allStudents.find((s) => s.id === studentId);
@@ -101,7 +106,7 @@ async function openStudentSchedule(studentId) {
     if (data.status && data.data) {
       studentScheduleSlots = data.data.map((s) => ({
         day_of_week: s.day_of_week,
-        time_slot: s.time_slot,
+        time_slot: normalizeTimeSlot(s.time_slot),
       }));
     } else {
       studentScheduleSlots = [];
@@ -202,13 +207,24 @@ function addScheduleSlot() {
     showNotification("Сначала выберите день недели", "warning");
     return;
   }
-  studentScheduleSlots.push({ day_of_week: day, time_slot: timeSlot });
+  const normalizedTime = normalizeTimeSlot(timeSlot);
+  const alreadyExists = studentScheduleSlots.some(
+    (slot) =>
+      Number(slot.day_of_week) === Number(day) &&
+      normalizeTimeSlot(slot.time_slot) === normalizedTime,
+  );
+  if (alreadyExists) {
+    showNotification("Это время уже есть в расписании", "warning");
+    return;
+  }
+  studentScheduleSlots.push({ day_of_week: day, time_slot: normalizedTime });
   saveStudentSchedule(false);
   renderStudentScheduleSlots();
 }
 
 function removeScheduleSlot(index) {
   studentScheduleSlots.splice(index, 1);
+  saveStudentSchedule(false);
   renderStudentScheduleSlots();
 }
 
@@ -343,6 +359,9 @@ async function loadTeacherSchedule() {
 }
 
 function showNotification(message, type = "success") {
+  if (type !== "danger") {
+    return;
+  }
   const notification = document.createElement("div");
   notification.className = `alert alert-${type} alert-dismissible fade show alert-custom`;
   notification.innerHTML = `
