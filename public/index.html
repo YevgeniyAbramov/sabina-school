@@ -21,9 +21,9 @@
     <style>
       :root {
         /* Фоны */
-        --bg-page: #fff8f2;
+        --bg-page: #ffffff;
         --card-bg: #ffffff;
-        --card-border: #f0e6d8;
+        --card-border: #e5e7eb;
         --card-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
 
         /* Текст */
@@ -126,8 +126,37 @@
         opacity: 0.8;
       }
 
+      .navbar .nav-icon {
+        margin-right: 0.5rem;
+      }
+
+      @media (max-width: 767px) {
+        .navbar .navbar-brand {
+          font-size: 1.1rem;
+        }
+        .navbar .navbar-brand i {
+          font-size: 1.2rem;
+        }
+        .navbar .btn-text {
+          display: none;
+        }
+        .navbar .nav-icon {
+          margin-right: 0 !important;
+        }
+        .navbar .btn-nav-link {
+          padding: 0.35rem 0.5rem;
+        }
+        .navbar .d-flex.gap-2 {
+          gap: 0.25rem !important;
+        }
+        .navbar .container-fluid {
+          padding-left: 0.5rem;
+          padding-right: 0.5rem;
+        }
+      }
+
       .summary-card {
-        background: linear-gradient(135deg, #f8f9fa, #ffffff);
+        background: #ffffff;
         border: 1px solid var(--card-border);
         border-radius: 16px;
         padding: 1.5rem;
@@ -411,7 +440,7 @@
         position: sticky;
         top: 1rem;
         z-index: 25;
-        background: rgba(255, 248, 242, 0.95);
+        background: rgba(255, 255, 255, 0.98);
         border-radius: 24px;
         padding: 1rem 1.25rem;
         box-shadow: 0 18px 35px rgba(15, 23, 42, 0.08);
@@ -433,6 +462,247 @@
         transform: translateY(-1px);
         box-shadow: 0 16px 32px rgba(124, 58, 237, 0.4);
       }
+
+      .schedule-modal-content {
+        max-height: 70vh;
+        overflow-y: auto;
+      }
+      .schedule-day-card {
+        background: var(--card-bg);
+        border: 2px solid var(--card-border);
+        border-radius: 12px;
+        padding: 1rem;
+      }
+      .schedule-day-card.load-light {
+        border-color: #94a3b8;
+      }
+      .schedule-day-card.load-ok {
+        border-color: #10b981;
+      }
+      .schedule-day-card.load-medium {
+        border-color: #f59e0b;
+      }
+      .schedule-day-card.load-heavy {
+        border-color: #ef4444;
+      }
+      .schedule-day-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        margin-bottom: 0.6rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid var(--card-border);
+      }
+      .schedule-slot-row {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.35rem 0;
+        font-size: 0.9rem;
+      }
+      .schedule-slot-row .time-badge {
+        background: rgba(92, 106, 196, 0.12);
+        color: var(--accent-start);
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        font-weight: 600;
+        min-width: 4rem;
+        text-align: center;
+        font-size: 0.85rem;
+      }
+      .teacher-schedule-accordion .accordion-item {
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 0.6rem;
+      }
+      .teacher-schedule-accordion .accordion-item.schedule-load-ok {
+        border-color: #10b981;
+      }
+      .teacher-schedule-accordion .accordion-item.schedule-load-heavy {
+        border-color: #ef4444;
+      }
+      .teacher-schedule-accordion .accordion-item.schedule-load-ok .schedule-day-count {
+        background: rgba(16, 185, 129, 0.18);
+        color: #047857;
+      }
+      .teacher-schedule-accordion .accordion-item.schedule-load-heavy .schedule-day-count {
+        background: rgba(239, 68, 68, 0.18);
+        color: #b91c1c;
+      }
+      .teacher-schedule-accordion .accordion-button {
+        font-weight: 600;
+        color: var(--text-primary);
+        background: #fff;
+        box-shadow: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .teacher-schedule-accordion .accordion-button:not(.collapsed) {
+        background: rgba(92, 106, 196, 0.08);
+        color: var(--accent-start);
+      }
+      .teacher-schedule-accordion .accordion-button::after {
+        margin-left: 0.75rem;
+      }
+      .teacher-schedule-accordion .accordion-body {
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+      }
+      .schedule-day-count {
+        margin-left: auto;
+        margin-right: 0.65rem;
+        background: rgba(92, 106, 196, 0.12);
+        color: var(--accent-start);
+        font-size: 0.8rem;
+        font-weight: 700;
+        line-height: 1;
+        border-radius: 999px;
+        padding: 0.35rem 0.55rem;
+        min-width: 1.8rem;
+        text-align: center;
+      }
+      .schedule-add-row .form-select,
+      .schedule-add-row .form-control {
+        height: 2.5rem;
+        font-size: 1rem;
+      }
+      @media (max-width: 575px) {
+        #studentScheduleModal .modal-body {
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+      }
+      .schedule-add-row .btn-add-lesson {
+        min-height: 2.75rem;
+        min-width: 8.5rem;
+        padding: 0.5rem 1rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .schedule-add-row .btn-add-lesson i {
+        font-size: 1rem;
+      }
+      .day-picker {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      .day-picker-btn {
+        flex: 1 1 calc(50% - 0.5rem);
+        min-width: 0;
+        padding: 0.6rem 0.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border: 2px solid var(--card-border);
+        border-radius: 10px;
+        background: #fff;
+        color: var(--text-primary);
+        transition: all 0.2s;
+      }
+      .day-picker-btn:hover {
+        border-color: var(--accent-start);
+      }
+      .day-picker-btn.active {
+        border-color: var(--accent-start);
+        background: rgba(92, 106, 196, 0.12);
+        color: var(--accent-start);
+      }
+      .time-wheel-wrap {
+        position: relative;
+        height: 118px;
+        display: flex;
+        background: #f8f9fa;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+      }
+      .schedule-time-section {
+        width: 100%;
+        margin: 0 0 1rem;
+      }
+      .schedule-time-section .form-label {
+        display: block;
+        text-align: left;
+      }
+      .schedule-add-row .day-picker {
+        margin-bottom: 0.75rem;
+      }
+      .time-wheel-col {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+      }
+      .time-wheel-col::before,
+      .time-wheel-col::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 42px;
+        pointer-events: none;
+        z-index: 2;
+      }
+      .time-wheel-col::before {
+        top: 0;
+        background: linear-gradient(to bottom, #f8f9fa, transparent);
+      }
+      .time-wheel-col::after {
+        bottom: 0;
+        background: linear-gradient(to top, #f8f9fa, transparent);
+      }
+      .time-wheel-scroll {
+        height: 100%;
+        overflow-y: auto;
+        scroll-snap-type: y mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding: 42px 0;
+      }
+      .time-wheel-scroll::-webkit-scrollbar {
+        display: none;
+      }
+      .time-wheel-scroll {
+        scrollbar-width: none;
+      }
+      .time-wheel-item {
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        scroll-snap-align: center;
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-muted);
+      }
+      .time-wheel-item.selected {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      .time-wheel-col .selected-line {
+        position: absolute;
+        left: 4px;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 34px;
+        border-radius: 8px;
+        background: rgba(92, 106, 196, 0.15);
+        pointer-events: none;
+        z-index: 1;
+      }
+      .time-wheel-label {
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+      }
     </style>
   </head>
   <body>
@@ -443,21 +713,32 @@
         </span>
         <div class="d-flex align-items-center gap-2">
           <button
-            class="btn btn-link text-white text-decoration-none btn-nav-link d-flex align-items-center me-1"
+            class="btn btn-link text-white text-decoration-none btn-nav-link d-flex align-items-center"
             data-bs-toggle="modal"
             data-bs-target="#summaryModal"
             onclick="loadMonthlySummary()"
+            title="Итоги"
           >
-            <i class="bi bi-graph-up me-2"></i>
-            <span class="btn-text">Итоги</span>
+            <i class="bi bi-graph-up nav-icon"></i>
+            <span class="btn-text d-none d-md-inline">Итоги</span>
+          </button>
+          <button
+            class="btn btn-link text-white text-decoration-none btn-nav-link d-flex align-items-center"
+            data-bs-toggle="modal"
+            data-bs-target="#scheduleModal"
+            title="Расписание"
+          >
+            <i class="bi bi-calendar-week nav-icon"></i>
+            <span class="btn-text d-none d-md-inline">Расписание</span>
           </button>
           <button
             class="btn btn-link text-white text-decoration-none btn-nav-link d-flex align-items-center"
             data-bs-toggle="modal"
             data-bs-target="#userModal"
+            title="Профиль"
           >
-            <i class="bi bi-person-circle me-2"></i>
-            <span id="teacherNameText">Преподаватель</span>
+            <i class="bi bi-person-circle nav-icon"></i>
+            <span id="teacherNameText" class="btn-text d-none d-md-inline">Преподаватель</span>
           </button>
         </div>
       </div>
@@ -797,13 +1078,100 @@
       </div>
     </div>
 
+    <div class="modal fade" id="scheduleModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-calendar-week me-2"></i>Расписание
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div id="teacherScheduleContent" class="schedule-modal-content">
+              <div class="text-muted small">Загрузка...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="studentScheduleModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-calendar-week me-2"></i>
+              <span id="studentScheduleModalTitle">Расписание ученика</span>
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="studentScheduleId" />
+            <div class="mb-3 schedule-add-row">
+              <label class="form-label fw-semibold">День недели</label>
+              <div class="day-picker" id="scheduleDayPicker">
+                <button type="button" class="day-picker-btn" data-day="1">Понедельник</button>
+                <button type="button" class="day-picker-btn" data-day="2">Вторник</button>
+                <button type="button" class="day-picker-btn" data-day="3">Среда</button>
+                <button type="button" class="day-picker-btn" data-day="4">Четверг</button>
+                <button type="button" class="day-picker-btn" data-day="5">Пятница</button>
+                <button type="button" class="day-picker-btn" data-day="6">Суббота</button>
+                <button type="button" class="day-picker-btn" data-day="0">Воскресенье</button>
+              </div>
+              <div id="scheduleTimeSection" class="schedule-time-section d-none">
+                <label class="form-label fw-semibold">Время</label>
+                <div class="time-wheel-wrap">
+                  <div class="time-wheel-col">
+                    <div class="selected-line"></div>
+                    <div class="time-wheel-scroll" id="scheduleHoursWheel"></div>
+                    <div class="time-wheel-label">час</div>
+                  </div>
+                  <div class="time-wheel-col">
+                    <div class="selected-line"></div>
+                    <div class="time-wheel-scroll" id="scheduleMinutesWheel"></div>
+                    <div class="time-wheel-label">мин</div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex justify-content-center">
+                <button
+                  type="button"
+                  id="scheduleAddBtn"
+                  class="btn btn-primary btn-add-lesson"
+                  onclick="addScheduleSlot()"
+                  title="Добавить в расписание"
+                >
+                  <i class="bi bi-plus me-1"></i> Добавить
+                </button>
+              </div>
+            </div>
+            <div>
+              <label class="form-label fw-semibold">Текущее расписание</label>
+              <div
+                id="studentScheduleSlots"
+                class="list-group list-group-flush"
+              >
+                <div class="text-muted small">Загрузка...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal fade" id="userModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">
-              <i class="bi bi-person-circle me-2"></i>Профиль
-            </h5>
             <button
               type="button"
               class="btn-close"

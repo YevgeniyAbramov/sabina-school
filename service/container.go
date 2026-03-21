@@ -5,9 +5,10 @@ import (
 )
 
 type Services struct {
-	Student        *StudentService
-	Auth           *AuthService
-	MonthlySummary *MonthlySummaryService
+	Student         *StudentService
+	Auth            *AuthService
+	MonthlySummary  *MonthlySummaryService
+	StudentSchedule *StudentScheduleService
 }
 
 func NewServices(repos *db.Repositories) *Services {
@@ -16,8 +17,9 @@ func NewServices(repos *db.Repositories) *Services {
 	monthlySummaryService := NewMonthlySummaryService(repos.MonthlySummary)
 
 	return &Services{
-		Student:        NewStudentService(repos.Student, monthlySummaryService),
-		Auth:           NewAuthService(repos.Teacher),
-		MonthlySummary: monthlySummaryService,
+		Student:         NewStudentService(repos.Student, monthlySummaryService),
+		Auth:            NewAuthService(repos.Teacher),
+		MonthlySummary:  monthlySummaryService,
+		StudentSchedule: NewStudentScheduleService(repos.StudentSchedule, repos.Student),
 	}
 }

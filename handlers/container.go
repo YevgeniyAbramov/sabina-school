@@ -5,15 +5,17 @@ import (
 )
 
 type Handlers struct {
-	Student        *StudentHandler
-	Auth           *AuthHandler
-	MonthlySummary *MonthlySummaryHandler
+	Student         *StudentHandler
+	Auth            *AuthHandler
+	MonthlySummary  *MonthlySummaryHandler
+	StudentSchedule *StudentScheduleHandler
 }
 
 func NewHandlers(services *service.Services) *Handlers {
 	return &Handlers{
-		Student:        NewStudentHandler(services.Student),
-		Auth:           NewAuthHandler(services.Auth),
-		MonthlySummary: NewMonthlySummaryHandler(services.MonthlySummary),
+		Student:         NewStudentHandler(services.Student),
+		Auth:            NewAuthHandler(services.Auth),
+		MonthlySummary:  NewMonthlySummaryHandler(services.MonthlySummary),
+		StudentSchedule: NewStudentScheduleHandler(services.StudentSchedule),
 	}
 }
