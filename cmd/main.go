@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"path/filepath"
 	"sckool/auth"
 	"sckool/db"
 	handler "sckool/handlers"
@@ -60,9 +61,35 @@ func main() {
 
 	app.Use(logger.New())
 
-	app.Static("/", "./public")
-
+	// API сначала — не перехватывается статикой
 	routes.Use(app, handlers.Student, handlers.Auth, handlers.MonthlySummary, handlers.StudentSchedule)
 
+	webRoot := resolveWebRoot()
+	indexHTML := filepath.Join(webRoot, "index.html")
+	log.Printf("Serving frontend from %s", webRoot)
+
+	app.Static("/", webRoot, fiber.Static{
+		Index: "index.html",
+	})
+
+	// SPA fallback: клиентские маршруты (/login и т.д.)
+	app.Get("/*", func(c *fiber.Ctx) error {
+		return c.SendFile(indexHTML)
+	})
+
 	log.Fatal(app.Listen(":" + port))
+}
+
+func resolveWebRoot() string {
+	if v := os.Getenv("WEB_ROOT"); v != "" {
+		return v
+	}
+	candidates := []string{"./web2/dist", "./public"}
+	for _, dir := range candidates {
+		if _, err := os.Stat(filepath.Join(dir, "index.html")); err == nil {
+			return dir
+		}
+	}
+	log.Println("Warning: web2/dist not found, falling back to ./public")
+	return "./public"
 }
