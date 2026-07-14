@@ -39,3 +39,7 @@ Thumbs.db
 tmp/
 temp/
 
+# Frontend (web2)
+web2/node_modules/
+web2/dist/
+

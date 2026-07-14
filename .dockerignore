@@ -9,4 +9,6 @@ tmp/
 temp/
 *.log
 .DS_Store
-
+web2/node_modules
+web2/dist
+public
