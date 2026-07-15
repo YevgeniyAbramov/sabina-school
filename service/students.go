@@ -11,12 +11,18 @@ import (
 type StudentService struct {
 	repo                  db.StudentRepository
 	monthlySummaryService *MonthlySummaryService
+	activity              *ActivityService
 }
 
-func NewStudentService(repo db.StudentRepository, monthlySummaryService *MonthlySummaryService) *StudentService {
+func NewStudentService(
+	repo db.StudentRepository,
+	monthlySummaryService *MonthlySummaryService,
+	activity *ActivityService,
+) *StudentService {
 	return &StudentService{
 		repo:                  repo,
 		monthlySummaryService: monthlySummaryService,
+		activity:              activity,
 	}
 }
 
@@ -28,6 +34,11 @@ func (s *StudentService) CreateStudent(ctx context.Context, student models.Stude
 
 	if student.IsPaid && student.PaidAmount > 0 {
 		go s.monthlySummaryService.AddPaymentToMonthlySummary(ctx, student.TeacherID, student.PaidAmount)
+	}
+
+	s.activity.RecordStudentCreated(student.TeacherID, result)
+	if student.IsPaid && student.PaidAmount > 0 {
+		s.activity.RecordPayment(student.TeacherID, result, student.PaidAmount, "Оплата при добавлении")
 	}
 
 	go logger.Log("create_student", student.TeacherID, &result.Id, "success", "Студент создан")
@@ -73,9 +84,41 @@ func (s *StudentService) UpdateStudent(ctx context.Context, id int, teacherID in
 		return nil, err
 	}
 
-	if student.IsPaid && student.PaidAmount > oldStudent.PaidAmount {
-		diff := student.PaidAmount - oldStudent.PaidAmount
-		go s.monthlySummaryService.AddPaymentToMonthlySummaryByDate(ctx, teacherID, diff, result.UpdatedAt)
+	if student.IsPaid && student.PaidAmount > 0 {
+		isNewCycle := student.RemainingLessons == student.TotalLessons &&
+			student.RemainingLessons > oldStudent.RemainingLessons
+		if isNewCycle {
+			go s.monthlySummaryService.AddPaymentToMonthlySummaryByDate(ctx, teacherID, student.PaidAmount, result.UpdatedAt)
+			s.activity.RecordRenew(teacherID, result, student.TotalLessons, student.PaidAmount)
+		} else if student.PaidAmount > oldStudent.PaidAmount {
+			diff := student.PaidAmount - oldStudent.PaidAmount
+			go s.monthlySummaryService.AddPaymentToMonthlySummaryByDate(ctx, teacherID, diff, result.UpdatedAt)
+			s.activity.RecordPayment(teacherID, result, diff, "Доплата")
+		} else if oldStudent.IsPaid != student.IsPaid {
+			detail := "Отмечено: не оплачено"
+			if student.IsPaid {
+				detail = "Отмечено: оплачено"
+			}
+			s.activity.Record(context.Background(), models.Activity{
+				TeacherID: teacherID,
+				StudentID: &id,
+				Kind:      models.ActivityPayment,
+				Title:     StudentDisplayName(result),
+				Detail:    detail,
+			})
+		}
+	} else if oldStudent.IsPaid != student.IsPaid {
+		detail := "Отмечено: не оплачено"
+		if student.IsPaid {
+			detail = "Отмечено: оплачено"
+		}
+		s.activity.Record(context.Background(), models.Activity{
+			TeacherID: teacherID,
+			StudentID: &id,
+			Kind:      models.ActivityPayment,
+			Title:     StudentDisplayName(result),
+			Detail:    detail,
+		})
 	}
 
 	go logger.Log("update_student", teacherID, &id, "success", "Студент обновлен")
@@ -115,6 +158,7 @@ func (s *StudentService) CompleteLesson(ctx context.Context, id int, teacherID i
 		return err
 	}
 
+	s.activity.RecordLesson(teacherID, resp)
 	go logger.Log("complete_lesson", teacherID, &id, "success", "Урок завершен")
 	return nil
 }
@@ -132,6 +176,7 @@ func (s *StudentService) MarkMissed(ctx context.Context, id int, teacherID int) 
 		return err
 	}
 
+	s.activity.RecordMissed(teacherID, student)
 	go logger.Log("mark_missed", teacherID, &id, "success", "Пропуск отмечен")
 	return nil
 }

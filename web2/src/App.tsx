@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
 import { LoginPage } from './pages/LoginPage'
 import { StudentsPage } from './pages/StudentsPage'
+import { HistoryPage } from './pages/HistoryPage'
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={<StudentsPage />} />
+            <Route path="/history" element={<HistoryPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>

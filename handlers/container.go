@@ -9,6 +9,7 @@ type Handlers struct {
 	Auth            *AuthHandler
 	MonthlySummary  *MonthlySummaryHandler
 	StudentSchedule *StudentScheduleHandler
+	Activity        *ActivityHandler
 }
 
 func NewHandlers(services *service.Services) *Handlers {
@@ -17,5 +18,6 @@ func NewHandlers(services *service.Services) *Handlers {
 		Auth:            NewAuthHandler(services.Auth),
 		MonthlySummary:  NewMonthlySummaryHandler(services.MonthlySummary),
 		StudentSchedule: NewStudentScheduleHandler(services.StudentSchedule),
+		Activity:        NewActivityHandler(services.Activity),
 	}
 }

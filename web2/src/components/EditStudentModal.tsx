@@ -13,7 +13,12 @@ interface Props {
 }
 
 export function EditStudentModal({ open, student, onClose, onSubmit }: Props) {
-  const [form, setForm] = useState<StudentInput | null>(null)
+  const [form, setForm] = useState<{
+    first_name: string
+    last_name: string
+    middle_name: string
+    is_paid: boolean
+  } | null>(null)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -22,10 +27,6 @@ export function EditStudentModal({ open, student, onClose, onSubmit }: Props) {
         first_name: student.first_name,
         last_name: student.last_name || '',
         middle_name: student.middle_name || '',
-        total_lessons: student.total_lessons,
-        remaining_lessons: student.remaining_lessons,
-        paid_amount: student.paid_amount,
-        missed_classes: student.missed_classes,
         is_paid: student.is_paid,
       })
     }
@@ -34,9 +35,22 @@ export function EditStudentModal({ open, student, onClose, onSubmit }: Props) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!student || !form) return
+
+    // Уроки и сумма не трогаем — только ФИО и статус оплаты
+    const payload: StudentInput = {
+      first_name: form.first_name,
+      last_name: form.last_name,
+      middle_name: form.middle_name,
+      total_lessons: student.total_lessons,
+      remaining_lessons: student.remaining_lessons,
+      paid_amount: student.paid_amount,
+      missed_classes: student.missed_classes,
+      is_paid: form.is_paid,
+    }
+
     setSaving(true)
     try {
-      await onSubmit(student.id, form)
+      await onSubmit(student.id, payload)
       onClose()
     } catch {
       // ошибка уже показана в родителе
@@ -49,7 +63,7 @@ export function EditStudentModal({ open, student, onClose, onSubmit }: Props) {
     <Modal
       open={open}
       onClose={onClose}
-      title="Редактирование"
+      title="Изменить"
       footer={
         <>
           <Button type="button" variant="ghost" className="h-10" onClick={onClose}>
@@ -84,46 +98,13 @@ export function EditStudentModal({ open, student, onClose, onSubmit }: Props) {
             value={form.middle_name}
             onChange={(v) => setForm((f) => f && { ...f, middle_name: v })}
           />
-          <div className="grid grid-cols-2 gap-3">
-            <Field
-              label="Всего уроков"
-              type="number"
-              value={String(form.total_lessons)}
-              onChange={(v) =>
-                setForm((f) => f && { ...f, total_lessons: parseInt(v) || 0 })
-              }
-            />
-            <Field
-              label="Осталось"
-              type="number"
-              value={String(form.remaining_lessons)}
-              onChange={(v) =>
-                setForm(
-                  (f) => f && { ...f, remaining_lessons: parseInt(v) || 0 },
-                )
-              }
-            />
-            <Field
-              label="Сумма, ₸"
-              type="number"
-              value={String(form.paid_amount)}
-              onChange={(v) =>
-                setForm((f) => f && { ...f, paid_amount: parseInt(v) || 0 })
-              }
-            />
-            <Field
-              label="Пропуски"
-              type="number"
-              value={String(form.missed_classes)}
-              onChange={(v) =>
-                setForm((f) => f && { ...f, missed_classes: parseInt(v) || 0 })
-              }
-            />
-          </div>
           <PaidToggle
             value={form.is_paid}
             onChange={(is_paid) => setForm((f) => f && { ...f, is_paid })}
           />
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            Уроки и сумму меняйте через «Продлить» в меню карточки.
+          </p>
         </form>
       )}
     </Modal>

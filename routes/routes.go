@@ -11,7 +11,8 @@ func Use(app *fiber.App,
 	studentHandler *handler.StudentHandler,
 	authHandler *handler.AuthHandler,
 	monthlySummaryHandler *handler.MonthlySummaryHandler,
-	scheduleHandler *handler.StudentScheduleHandler) {
+	scheduleHandler *handler.StudentScheduleHandler,
+	activityHandler *handler.ActivityHandler) {
 
 	app.Get("/status", handler.CheckStatus)
 	api := app.Group("/api/v1/")
@@ -33,4 +34,5 @@ func Use(app *fiber.App,
 	protected.Get("/schedule", scheduleHandler.GetByTeacherAndDay)
 
 	protected.Get("/monthly-summary", monthlySummaryHandler.GetMonthlySummary)
+	protected.Get("/activity", activityHandler.List)
 }

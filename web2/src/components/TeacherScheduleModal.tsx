@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { ChevronDown, Download } from 'lucide-react'
 import { Modal } from '@/components/Modal'
+import { TodayAgenda } from '@/components/TodayAgenda'
+import { Button } from '@/components/ui/button'
 import { scheduleApi } from '@/api'
 import { AuthError } from '@/api/client'
 import { cn, DAY_NAMES, formatTime } from '@/lib/utils'
+import { exportWeekScheduleImage } from '@/lib/scheduleImage'
 import type { ScheduleSlot, Student } from '@/types'
 
 interface Props {
@@ -11,6 +14,8 @@ interface Props {
   students: Student[]
   onClose: () => void
   onUnauthorized: () => void
+  onComplete: (studentId: number) => void
+  onMissed: (studentId: number) => void
 }
 
 interface DayGroup {
@@ -18,22 +23,38 @@ interface DayGroup {
   slots: ScheduleSlot[]
 }
 
+type Tab = 'today' | 'week'
+
 export function TeacherScheduleModal({
   open,
   students,
   onClose,
   onUnauthorized,
+  onComplete,
+  onMissed,
 }: Props) {
+  const [tab, setTab] = useState<Tab>('today')
+  const [agendaLabel, setAgendaLabel] = useState('Сегодня')
   const [days, setDays] = useState<DayGroup[]>([])
   const [loading, setLoading] = useState(false)
   const [expanded, setExpanded] = useState<number | null>(null)
   const [error, setError] = useState(false)
 
+  const handleAgendaLabel = useCallback((label: string) => {
+    setAgendaLabel(label)
+  }, [])
+
   useEffect(() => {
     if (!open) return
+    setTab('today')
+    setAgendaLabel('Сегодня')
+    setExpanded(null)
+  }, [open])
+
+  useEffect(() => {
+    if (!open || tab !== 'week') return
     setLoading(true)
     setError(false)
-    setExpanded(null)
 
     Promise.all(
       Array.from({ length: 7 }, (_, day) =>
@@ -49,7 +70,7 @@ export function TeacherScheduleModal({
         else setError(true)
       })
       .finally(() => setLoading(false))
-  }, [open, onUnauthorized])
+  }, [open, tab, onUnauthorized])
 
   const dayOrder = [1, 2, 3, 4, 5, 6, 0]
   const ordered = dayOrder.map(
@@ -63,8 +84,44 @@ export function TeacherScheduleModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Расписание на неделю" size="lg">
-      {loading ? (
+    <Modal open={open} onClose={onClose} title="Неделя" size="lg">
+      <div className="mb-4 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
+        <button
+          type="button"
+          onClick={() => setTab('today')}
+          className={cn(
+            'h-10 rounded-lg text-sm font-semibold transition',
+            tab === 'today'
+              ? 'bg-card text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          {agendaLabel}
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab('week')}
+          className={cn(
+            'h-10 rounded-lg text-sm font-semibold transition',
+            tab === 'week'
+              ? 'bg-card text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          Вся неделя
+        </button>
+      </div>
+
+      {tab === 'today' ? (
+        <TodayAgenda
+          students={students}
+          active={open && tab === 'today'}
+          onLabelChange={handleAgendaLabel}
+          onComplete={onComplete}
+          onMissed={onMissed}
+          onUnauthorized={onUnauthorized}
+        />
+      ) : loading ? (
         <p className="py-8 text-center text-sm text-muted-foreground">
           Загрузка…
         </p>
@@ -79,7 +136,22 @@ export function TeacherScheduleModal({
           Слоты задаются в карточке ученика → Расписание.
         </p>
       ) : (
-        <div className="space-y-2">
+        <div>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <p className="text-sm text-muted-foreground">
+              Нажмите на день, чтобы раскрыть список
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => exportWeekScheduleImage(days, students)}
+              className="gap-1.5"
+            >
+              <Download size={15} /> Скачать картинку
+            </Button>
+          </div>
+          <div className="space-y-2">
           {ordered.map(({ day, slots }) => {
             const count = slots.length
             const sorted = [...slots].sort((a, b) =>
@@ -140,7 +212,7 @@ export function TeacherScheduleModal({
                             <span className="rounded-lg bg-primary/10 px-2 py-1 font-mono text-xs font-semibold tabular-nums text-primary">
                               {formatTime(s.time_slot)}
                             </span>
-                            <span>{studentName(s.student_id!)}</span>
+                            <span>{studentName(s.student_id)}</span>
                           </li>
                         ))}
                       </ul>
@@ -150,6 +222,7 @@ export function TeacherScheduleModal({
               </div>
             )
           })}
+          </div>
         </div>
       )}
     </Modal>

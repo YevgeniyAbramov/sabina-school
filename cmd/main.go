@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"context"
 	"sckool/auth"
 	"sckool/db"
 	handler "sckool/handlers"
@@ -36,6 +37,10 @@ func main() {
 	services := service.NewServices(repos)
 	handlers := handler.NewHandlers(services)
 
+	if err := services.Activity.EnsureSchema(context.Background()); err != nil {
+		log.Printf("Warning: activity schema: %v", err)
+	}
+
 	esURL := os.Getenv("ELASTICSEARCH_URL")
 	esUsername := os.Getenv("ELASTICSEARCH_USERNAME")
 	esPassword := os.Getenv("ELASTICSEARCH_PASSWORD")
@@ -62,7 +67,7 @@ func main() {
 	app.Use(logger.New())
 
 	// API сначала — не перехватывается статикой
-	routes.Use(app, handlers.Student, handlers.Auth, handlers.MonthlySummary, handlers.StudentSchedule)
+	routes.Use(app, handlers.Student, handlers.Auth, handlers.MonthlySummary, handlers.StudentSchedule, handlers.Activity)
 
 	webRoot := resolveWebRoot()
 	indexHTML := filepath.Join(webRoot, "index.html")

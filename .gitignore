@@ -39,7 +39,11 @@ Thumbs.db
 tmp/
 temp/
 
-# Frontend (web2)
+# Frontend (web2) — never commit deps or build output
+node_modules/
+**/node_modules/
 web2/node_modules/
+dist/
+**/dist/
 web2/dist/
 

@@ -27,7 +27,7 @@ export interface StudentInput {
 
 export interface ScheduleSlot {
   id?: number
-  student_id?: number
+  student_id: number
   teacher_id?: number
   day_of_week: number
   time_slot: string
@@ -57,4 +57,31 @@ export interface ApiResponse<T = unknown> {
   }
 }
 
-export type PaymentFilter = 'all' | 'paid' | 'unpaid'
+export type ActivityKind =
+  | 'lesson'
+  | 'missed'
+  | 'payment'
+  | 'renew'
+  | 'student'
+
+export interface Activity {
+  id: number
+  teacher_id: number
+  student_id?: number | null
+  kind: ActivityKind
+  title: string
+  detail: string
+  amount?: number | null
+  created_at: string
+}
+
+export type StudentFilter =
+  | 'all'
+  | 'paid'
+  | 'unpaid'
+  | 'endingSoon'
+  | 'finished'
+
+/** @deprecated use StudentFilter */
+export type PaymentFilter = StudentFilter
+

@@ -5,6 +5,7 @@ interface AppShellProps {
   brand: ReactNode
   nav: ReactNode
   mobileNav?: ReactNode
+  mobileCols?: 4 | 5
   topRight?: ReactNode
   sidebarFooter?: ReactNode
   children: ReactNode
@@ -15,6 +16,7 @@ export function AppShell({
   brand,
   nav,
   mobileNav,
+  mobileCols = 4,
   topRight,
   sidebarFooter,
   children,
@@ -52,7 +54,12 @@ export function AppShell({
           className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-md safe-bottom lg:hidden"
           aria-label="Мобильная навигация"
         >
-          <div className="mx-auto grid max-w-lg grid-cols-4 items-end px-2 pt-1">
+          <div
+            className={cn(
+              'mx-auto grid max-w-lg items-end px-1 pt-1 sm:px-2',
+              mobileCols === 5 ? 'grid-cols-5' : 'grid-cols-4',
+            )}
+          >
             {mobileNav}
           </div>
         </nav>

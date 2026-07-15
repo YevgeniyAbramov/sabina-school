@@ -1,5 +1,13 @@
 import { apiRequest } from './client'
-import type { MonthlySummary, ScheduleSlot, ScheduleSlotInput, Student, StudentInput } from '../types'
+import type {
+  Activity,
+  ActivityKind,
+  MonthlySummary,
+  ScheduleSlot,
+  ScheduleSlotInput,
+  Student,
+  StudentInput,
+} from '../types'
 
 export const studentsApi = {
   list: () => apiRequest<Student[]>('/students'),
@@ -37,4 +45,9 @@ export const scheduleApi = {
 export const summaryApi = {
   get: (year: number, month: number) =>
     apiRequest<MonthlySummary>(`/monthly-summary?year=${year}&month=${month}`),
+}
+
+export const activityApi = {
+  list: (kind: ActivityKind | 'all' = 'all') =>
+    apiRequest<Activity[]>(`/activity?kind=${kind}`),
 }
