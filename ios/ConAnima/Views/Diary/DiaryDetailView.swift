@@ -1,10 +1,6 @@
 import SwiftUI
-import PhotosUI
-import UIKit
 
-/// Sheet-music amber — same fur tint as `PawBurst` / Live Activity.
-private let notesAccent = Color(red: 0.93, green: 0.62, blue: 0.32)
-
+/// Diary for one student — list of repertoire pieces (not lesson counts).
 struct DiaryDetailView: View {
     @Environment(AuthViewModel.self) private var auth
     @Environment(StudentsViewModel.self) private var studentsVM
@@ -12,70 +8,11 @@ struct DiaryDetailView: View {
 
     let studentId: Int
 
-    @State private var filter: MaterialFilter = .all
-    @State private var showAddLink = false
-    @State private var showPhotoPicker = false
-    @State private var showFileImporter = false
-    @State private var photoPickerItem: PhotosPickerItem?
-    @State private var pendingFile: PendingFile?
-    @State private var deleteTarget: StudentMaterial?
-
-    private enum MaterialFilter: Hashable {
-        case all, notes, links
-    }
-
-    private struct PendingFile: Identifiable {
-        let id = UUID()
-        let data: Data
-        let fileName: String
-        let mimeType: String
-    }
+    @State private var showAddPiece = false
+    @State private var deleteTarget: StudentPiece?
 
     private var student: Student? {
         studentsVM.students.first { $0.id == studentId }
-    }
-
-    private var notes: [StudentMaterial] {
-        vm.sorted.filter { $0.kind == .file }
-    }
-
-    private var links: [StudentMaterial] {
-        vm.sorted.filter { $0.kind == .link }
-    }
-
-    private var filteredMaterials: [StudentMaterial] {
-        switch filter {
-        case .all: return vm.sorted
-        case .notes: return notes
-        case .links: return links
-        }
-    }
-
-    private var shareText: String {
-        guard let student else { return "" }
-        var lines: [String] = [
-            "CON ANIMA — \(student.fullName)",
-            "",
-            "Уроков пройдено: \(student.completedLessons) из \(student.totalLessons)",
-            "Пропусков: \(student.missedClasses)",
-            "Осталось: \(student.remainingLessons)",
-        ]
-        if !notes.isEmpty {
-            lines.append("")
-            lines.append("Ноты:")
-            for m in notes {
-                lines.append("• \(m.title)")
-            }
-        }
-        if !links.isEmpty {
-            lines.append("")
-            lines.append("Ссылки:")
-            for m in links {
-                let url = m.url.isEmpty ? "" : " — \(m.url)"
-                lines.append("• \(m.title)\(url)")
-            }
-        }
-        return lines.joined(separator: "\n")
     }
 
     var body: some View {
@@ -87,72 +24,42 @@ struct DiaryDetailView: View {
             }
         }
         .background { AppCanvasBackground() }
-        .navigationTitle(student?.fullName ?? "Дневник")
+        .navigationTitle("Дневник")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Menu {
-                    Button { showAddLink = true } label: {
-                        Label("Ссылка (YouTube и т.п.)", systemImage: "link")
-                    }
-                    Button { showPhotoPicker = true } label: {
-                        Label("Фото нот", systemImage: "photo")
-                    }
-                    Button { showFileImporter = true } label: {
-                        Label("Файл (PDF)", systemImage: "doc")
-                    }
+                Button {
+                    showAddPiece = true
                 } label: {
                     Image(systemName: "plus")
                 }
-                .accessibilityLabel("Добавить материал")
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                if student != nil, !vm.isLoading {
-                    ShareLink(item: shareText) {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                    .accessibilityLabel("Поделиться статистикой")
-                }
+                .accessibilityLabel("Новое произведение")
             }
         }
-        .sheet(isPresented: $showAddLink) {
-            AddLinkSheet { title, url, note in
-                try await vm.addLink(
-                    studentId: studentId, title: title, url: url, note: note,
+        .sheet(isPresented: $showAddPiece) {
+            AddPieceSheet { title, composer in
+                try await vm.create(
+                    studentId: studentId,
+                    title: title,
+                    composer: composer,
                     onUnauthorized: auth.handleUnauthorized
                 )
             }
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
-        .sheet(item: $pendingFile) { pending in
-            AddFileDetailsSheet(fileName: pending.fileName) { title, note in
-                try await vm.addFile(
-                    studentId: studentId, title: title, note: note,
-                    fileName: pending.fileName, mimeType: pending.mimeType, fileData: pending.data,
-                    onUnauthorized: auth.handleUnauthorized
-                )
-            }
-            .presentationDetents([.medium, .large])
-            .presentationDragIndicator(.visible)
-        }
-        .photosPicker(isPresented: $showPhotoPicker, selection: $photoPickerItem, matching: .images)
-        .onChange(of: photoPickerItem) { _, item in
-            Task { await handlePhotoPick(item) }
-        }
-        .fileImporter(
-            isPresented: $showFileImporter,
-            allowedContentTypes: [.pdf, .png, .jpeg, .heic],
-            onCompletion: handleFileImport
-        )
         .alert(
-            "Удалить материал?",
+            "Удалить произведение?",
             isPresented: Binding(get: { deleteTarget != nil }, set: { if !$0 { deleteTarget = nil } })
         ) {
             Button("Удалить", role: .destructive) {
                 if let target = deleteTarget {
                     Task {
-                        await vm.delete(studentId: studentId, materialId: target.id, onUnauthorized: auth.handleUnauthorized)
+                        await vm.delete(
+                            studentId: studentId,
+                            pieceId: target.id,
+                            onUnauthorized: auth.handleUnauthorized
+                        )
                     }
                 }
                 deleteTarget = nil
@@ -177,6 +84,9 @@ struct DiaryDetailView: View {
         .task {
             await vm.load(studentId: studentId, onUnauthorized: auth.handleUnauthorized)
         }
+        .refreshable {
+            await vm.load(studentId: studentId, onUnauthorized: auth.handleUnauthorized)
+        }
     }
 
     @ViewBuilder
@@ -184,266 +94,107 @@ struct DiaryDetailView: View {
         if vm.isLoading {
             ProgressView("Загрузка…")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if vm.pieces.isEmpty {
+            emptyState(student)
         } else {
             List {
                 Section {
-                    statsCard(student)
-                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 4, trailing: 16))
+                    Text("Произведения \(student.firstName)")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .listRowInsets(EdgeInsets(top: 4, leading: 20, bottom: 0, trailing: 16))
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.clear)
                 }
 
                 Section {
-                    AppSegmentCapsule(
-                        options: [
-                            (value: MaterialFilter.all, title: "Все"),
-                            (value: MaterialFilter.notes, title: "Ноты"),
-                            (value: MaterialFilter.links, title: "Ссылки"),
-                        ],
-                        selection: $filter
-                    )
-                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
-                }
-
-                if filteredMaterials.isEmpty {
-                    Section {
-                        emptyCard
-                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
-                            .listRowSeparator(.hidden)
-                            .listRowBackground(Color.clear)
-                    }
-                } else {
-                    Section {
-                        ForEach(filteredMaterials) { material in
-                            MaterialRowView(material: material)
-                                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-                                .listRowSeparator(.hidden)
-                                .listRowBackground(Color.clear)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    if let url = material.resolvedURL {
-                                        UIApplication.shared.open(url)
-                                    }
-                                }
-                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                    Button(role: .destructive) {
-                                        deleteTarget = material
-                                    } label: {
-                                        Label("Удалить", systemImage: "trash")
-                                    }
-                                }
+                    ForEach(vm.pieces) { piece in
+                        NavigationLink(value: StudentRoute.piece(studentId: studentId, pieceId: piece.id)) {
+                            PieceRowView(piece: piece)
+                        }
+                        .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                deleteTarget = piece
+                            } label: {
+                                Label("Удалить", systemImage: "trash")
+                            }
                         }
                     }
                 }
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
+            .navigationLinkIndicatorVisibility(.hidden)
         }
     }
 
-    private func statsCard(_ student: Student) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("Прогресс \(student.firstName)")
-                    .font(.headline)
-                Spacer(minLength: 8)
-                Text("\(Int(student.progress * 100))%")
-                    .font(.subheadline.monospacedDigit().weight(.semibold))
-                    .foregroundStyle(.secondary)
-            }
-
-            ProgressView(value: student.progress)
-                .tint(AppTheme.primary)
-
-            HStack(spacing: 8) {
-                diaryMetric(title: "Уроки", value: "\(student.completedLessons)", hint: "из \(student.totalLessons)")
-                diaryMetric(title: "Пропуски", value: "\(student.missedClasses)", hint: nil)
-                diaryMetric(title: "Ноты", value: "\(notes.count)", hint: nil, tint: notesAccent)
-                diaryMetric(title: "Ссылки", value: "\(links.count)", hint: nil)
-            }
-        }
-        .padding(16)
-        .background(
-            Color(.secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous)
-        )
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
-    }
-
-    private func diaryMetric(title: String, value: String, hint: String?, tint: Color = AppTheme.primary) -> some View {
-        VStack(spacing: 4) {
-            Text(title)
-                .font(.caption2.weight(.medium))
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-            Text(value)
-                .font(.title3.weight(.bold).monospacedDigit())
-                .foregroundStyle(tint)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-            if let hint {
-                Text(hint)
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
-                    .lineLimit(1)
-            } else {
-                Text(" ")
-                    .font(.caption2)
-                    .hidden()
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 10)
-        .padding(.horizontal, 4)
-        .background(
-            Color(.systemBackground).opacity(0.72),
-            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
-        )
-    }
-
-    @ViewBuilder
-    private var emptyCard: some View {
-        let (title, symbol, hint, actionTitle, action): (String, String, String, String, () -> Void) = {
-            switch filter {
-            case .all:
-                return (
-                    "Дневник пока пуст",
-                    "music.note.list",
-                    "Добавьте ноты или ссылку — прогресс соберётся здесь",
-                    "Добавить ссылку",
-                    { showAddLink = true }
-                )
-            case .notes:
-                return (
-                    "Нет нот",
-                    "doc.richtext",
-                    "Сфотографируйте партитуру или загрузите PDF",
-                    "Добавить ноты",
-                    { showPhotoPicker = true }
-                )
-            case .links:
-                return (
-                    "Нет ссылок",
-                    "link",
-                    "YouTube, записи уроков и полезные материалы",
-                    "Добавить ссылку",
-                    { showAddLink = true }
-                )
-            }
-        }()
-
+    private func emptyState(_ student: Student) -> some View {
         VStack(spacing: 16) {
-            Image(systemName: symbol)
+            Image(systemName: "music.note.list")
                 .font(.system(size: 36, weight: .medium))
                 .foregroundStyle(AppTheme.primary.opacity(0.85))
                 .frame(width: 64, height: 64)
                 .background(AppTheme.primary.opacity(0.12), in: Circle())
 
             VStack(spacing: 6) {
-                Text(title)
+                Text("Репертуар пуст")
                     .font(.headline)
-                Text(hint)
+                Text("Добавьте произведение — внутри будут ноты, ссылки, готовность и заметки с уроков")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
 
-            Button(actionTitle, action: action)
+            Button("Новое произведение") { showAddPiece = true }
                 .buttonStyle(.borderedProminent)
                 .tint(AppTheme.primary)
                 .frame(minHeight: 44)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 28)
-        .padding(.horizontal, 20)
-        .background(
-            Color(.secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous)
-        )
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
-    }
-
-    private func handlePhotoPick(_ item: PhotosPickerItem?) async {
-        guard let item else { return }
-        defer { photoPickerItem = nil }
-        guard let data = try? await item.loadTransferable(type: Data.self) else {
-            vm.toastIsError = true
-            vm.toast = "Не удалось загрузить фото"
-            return
-        }
-        if let uiImage = UIImage(data: data), let jpeg = uiImage.jpegData(compressionQuality: 0.85) {
-            pendingFile = PendingFile(data: jpeg, fileName: "Скан.jpg", mimeType: "image/jpeg")
-        } else {
-            pendingFile = PendingFile(data: data, fileName: "Скан.jpg", mimeType: "image/jpeg")
-        }
-    }
-
-    private func handleFileImport(_ result: Result<URL, Error>) {
-        switch result {
-        case .success(let url):
-            guard url.startAccessingSecurityScopedResource() else { return }
-            defer { url.stopAccessingSecurityScopedResource() }
-            do {
-                let data = try Data(contentsOf: url)
-                pendingFile = PendingFile(
-                    data: data,
-                    fileName: url.lastPathComponent,
-                    mimeType: mimeType(forExtension: url.pathExtension)
-                )
-            } catch {
-                vm.toastIsError = true
-                vm.toast = "Не удалось прочитать файл"
-            }
-        case .failure:
-            break
-        }
-    }
-
-    private func mimeType(forExtension ext: String) -> String {
-        switch ext.lowercased() {
-        case "pdf": return "application/pdf"
-        case "png": return "image/png"
-        case "jpg", "jpeg": return "image/jpeg"
-        case "heic": return "image/heic"
-        default: return "application/octet-stream"
-        }
+        .padding(28)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
-private struct MaterialRowView: View {
-    let material: StudentMaterial
+private struct PieceRowView: View {
+    let piece: StudentPiece
 
     var body: some View {
-        HStack(spacing: 12) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(tint.opacity(0.12))
-                    .frame(width: 44, height: 44)
-                Image(systemName: symbolName)
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(tint)
-            }
-            .accessibilityHidden(true)
+        HStack(spacing: 14) {
+            ReadinessRing(value: piece.readiness)
+                .frame(width: 48, height: 48)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(material.title)
+                Text(piece.title)
                     .font(.body.weight(.semibold))
                     .foregroundStyle(.primary)
                     .lineLimit(2)
 
-                if !material.note.isEmpty {
-                    Text(material.note)
-                        .font(.caption)
+                if !piece.composer.isEmpty {
+                    Text(piece.composer)
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
-                        .lineLimit(2)
+                        .lineLimit(1)
                 }
 
-                Text(subtitle)
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                HStack(spacing: 8) {
+                    Text(piece.status.title)
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(AppTheme.primary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(AppTheme.primary.opacity(0.12), in: Capsule())
+
+                    let mats = piece.materialsCount ?? 0
+                    let notes = piece.notesCount ?? 0
+                    if mats > 0 || notes > 0 {
+                        Text("\(mats) мат. · \(notes) зам.")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -460,29 +211,111 @@ private struct MaterialRowView: View {
         .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
         .accessibilityElement(children: .combine)
     }
+}
 
-    private var symbolName: String {
-        switch material.kind {
-        case .link: return "play.rectangle.fill"
-        case .file: return material.isImage ? "photo.fill" : "doc.richtext.fill"
+struct ReadinessRing: View {
+    let value: Int
+
+    private var progress: Double {
+        min(1, max(0, Double(value) / 100))
+    }
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(AppTheme.primary.opacity(0.12), lineWidth: 4)
+            Circle()
+                .trim(from: 0, to: progress)
+                .stroke(AppTheme.primary, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+            Text("\(value)")
+                .font(.caption.weight(.bold).monospacedDigit())
+                .foregroundStyle(AppTheme.primary)
+        }
+        .accessibilityLabel("Готовность \(value) процентов")
+    }
+}
+
+struct AddPieceSheet: View {
+    let onConfirm: (_ title: String, _ composer: String) async throws -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @FocusState private var focused: Field?
+    @State private var title = ""
+    @State private var composer = ""
+    @State private var saving = false
+    @State private var error: String?
+
+    private enum Field { case title, composer }
+
+    private var canSave: Bool {
+        !title.trimmingCharacters(in: .whitespaces).isEmpty && !saving
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    VStack(spacing: 0) {
+                        field("Название", text: $title, field: .title, placeholder: "ХТК, прелюдия и фуга ре минор")
+                        Divider().padding(.leading, 14)
+                        field("Композитор", text: $composer, field: .composer, placeholder: "И. С. Бах")
+                    }
+                    .background(
+                        Color(.secondarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    )
+
+                    if let error {
+                        Text(error)
+                            .font(.footnote.weight(.medium))
+                            .foregroundStyle(AppTheme.danger)
+                    }
+                }
+                .padding(16)
+            }
+            .background { AppCanvasBackground() }
+            .navigationTitle("Новое произведение")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Закрыть") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Добавить") { Task { await save() } }
+                        .disabled(!canSave)
+                        .fontWeight(.semibold)
+                }
+            }
         }
     }
 
-    private var tint: Color {
-        switch material.kind {
-        case .link: return AppTheme.primary
-        case .file: return notesAccent
+    private func field(_ label: String, text: Binding<String>, field: Field, placeholder: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(.secondary)
+            TextField(placeholder, text: text)
+                .focused($focused, equals: field)
+                .textInputAutocapitalization(.sentences)
         }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
     }
 
-    private var subtitle: String {
-        let date = Formatters.dayLabel(material.createdAt)
-        switch material.kind {
-        case .link:
-            let host = material.resolvedURL?.host?.replacingOccurrences(of: "www.", with: "") ?? "Ссылка"
-            return "\(host) · \(date)"
-        case .file:
-            return "\(material.fileExtension.uppercased()) · \(date)"
+    private func save() async {
+        focused = nil
+        saving = true
+        error = nil
+        defer { saving = false }
+        do {
+            try await onConfirm(
+                title.trimmingCharacters(in: .whitespacesAndNewlines),
+                composer.trimmingCharacters(in: .whitespacesAndNewlines)
+            )
+            dismiss()
+        } catch {
+            self.error = (error as? LocalizedError)?.errorDescription ?? "Не удалось сохранить"
         }
     }
 }

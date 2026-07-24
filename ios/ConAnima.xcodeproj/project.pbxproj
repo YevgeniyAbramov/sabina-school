@@ -27,6 +27,7 @@
 		BBA7632D75386F17CABB5679 /* StudentFormSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3513C45964D9BD35006F310F /* StudentFormSheet.swift */; };
 		BCACFB21DE7013E49AF6FA99 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6163A94B145B87613484E9D /* JournalView.swift */; };
 		C056A279D52C35F1F264F072 /* DiaryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0132E770BDFD7E1019F52EA0 /* DiaryDetailView.swift */; };
+		CB118AF9E2E44B61A05B9033 /* PieceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A290B28C84B84371B92862AA /* PieceDetailView.swift */; };
 		CB1BB65A5B779B221B6FF2C6 /* HoldToAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A8F25B8B717ACCADE5D062 /* HoldToAction.swift */; };
 		D44C24B2759F9784EE57AC2D /* StudentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B71A9D8FC712605C8487A569 /* StudentsView.swift */; };
 		DAB9699068DB6AFEFD9AE66A /* Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F3CBFE96867649CCF8A9BA /* Formatters.swift */; };
@@ -67,6 +68,7 @@
 
 /* Begin PBXFileReference section */
 		0132E770BDFD7E1019F52EA0 /* DiaryDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DiaryDetailView.swift; sourceTree = "<group>"; };
+		A290B28C84B84371B92862AA /* PieceDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PieceDetailView.swift; sourceTree = "<group>"; };
 		16DAD1D26983CBD5895EE0A6 /* ConAnima.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ConAnima.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		19910EDCD5E1BCDBFF32A2B1 /* AppButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppButtons.swift; sourceTree = "<group>"; };
 		22D2793C48068D4BA70BE72D /* FormControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormControls.swift; sourceTree = "<group>"; };
@@ -271,6 +273,7 @@
 			isa = PBXGroup;
 			children = (
 				0132E770BDFD7E1019F52EA0 /* DiaryDetailView.swift */,
+				A290B28C84B84371B92862AA /* PieceDetailView.swift */,
 				5EA24A0F359C0BA6F6724611 /* AddMaterialSheets.swift */,
 			);
 			name = Diary;
@@ -440,6 +443,7 @@
 				DBB356AE2A8EF705C618FBFC /* SummaryView.swift in Sources */,
 				A71B9FFB464577693D9DE4D9 /* Theme.swift in Sources */,
 				C056A279D52C35F1F264F072 /* DiaryDetailView.swift in Sources */,
+				CB118AF9E2E44B61A05B9033 /* PieceDetailView.swift in Sources */,
 				30926CAE39B67FAE0C2C1047 /* AddMaterialSheets.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
