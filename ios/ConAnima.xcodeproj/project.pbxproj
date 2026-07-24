@@ -1,0 +1,747 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0A76B9BD2FB52ED753787B1E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54E55C5715EDB2031A2A97DF /* Assets.xcassets */; };
+		30926CAE39B67FAE0C2C1047 /* AddMaterialSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA24A0F359C0BA6F6724611 /* AddMaterialSheets.swift */; };
+		34E77E1C463B069A00ECE47C /* StudentDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86E9B00EF393AFE56EEAAD08 /* StudentDetailView.swift */; };
+		4088751F03523C1739E4C671 /* SlideToAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E2925048B37FA113BF389C /* SlideToAction.swift */; };
+		43BF4CC6931BD2EA72FBD91E /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EA7B695B2EAE70156BADE94 /* HistoryView.swift */; };
+		77B82CE4C31270CE242AB124 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7572275BC3C88972E14DA9E3 /* MainTabView.swift */; };
+		87E1D5926D2440781DD7E95E /* AppViewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E75C2F639E043FFB65D26B /* AppViewModels.swift */; };
+		8CA6310086921FBE5450D1AA /* AppButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19910EDCD5E1BCDBFF32A2B1 /* AppButtons.swift */; };
+		8FC33B570F37106B2ACC134F /* FormControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D2793C48068D4BA70BE72D /* FormControls.swift */; };
+		90AFD47AD6AF83E6F3FFB44B /* StudentRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57620BE5FAD55BF6E9124F6A /* StudentRowView.swift */; };
+		9D45B4FAA0A6B4CD239AD043 /* NavigationRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66562834403F6E9BFD1C5D /* NavigationRoutes.swift */; };
+		A71B9FFB464577693D9DE4D9 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92AEB509C4C285524B685693 /* Theme.swift */; };
+		AA11BB22CC33DD44EE55FF01 /* PawBurst.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF02 /* PawBurst.swift */; };
+		AA11BB22CC33DD44EE55FF03 /* LessonActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF04 /* LessonActivityAttributes.swift */; };
+		AA11BB22CC33DD44EE55FF05 /* LessonLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF06 /* LessonLiveActivity.swift */; };
+		B216D98B9559CCD845B8CEB0 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523671251ACE68EA98D7D845 /* LoginView.swift */; };
+		B8FD7C097FD0D84C3A3228A2 /* RunningCat.swift in Sources */ = {isa = PBXBuildFile; fileRef = A063316C343AF9D1CADFB5FB /* RunningCat.swift */; };
+		BBA7632D75386F17CABB5679 /* StudentFormSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3513C45964D9BD35006F310F /* StudentFormSheet.swift */; };
+		BCACFB21DE7013E49AF6FA99 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6163A94B145B87613484E9D /* JournalView.swift */; };
+		C056A279D52C35F1F264F072 /* DiaryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0132E770BDFD7E1019F52EA0 /* DiaryDetailView.swift */; };
+		CB118AF9E2E44B61A05B9033 /* PieceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A290B28C84B84371B92862AA /* PieceDetailView.swift */; };
+		CB1BB65A5B779B221B6FF2C6 /* HoldToAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A8F25B8B717ACCADE5D062 /* HoldToAction.swift */; };
+		D44C24B2759F9784EE57AC2D /* StudentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B71A9D8FC712605C8487A569 /* StudentsView.swift */; };
+		DAB9699068DB6AFEFD9AE66A /* Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F3CBFE96867649CCF8A9BA /* Formatters.swift */; };
+		DBB356AE2A8EF705C618FBFC /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CDC0869FCA9CBC44A5CA3DF /* SummaryView.swift */; };
+		DD1DF9506C9DE80071DAE55B /* ConAnimaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB80BAE3B66305B875A799F8 /* ConAnimaApp.swift */; };
+		E678DB06EB4531240DF90065 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5752FCFF2E2804CFFE94D3FD /* APIClient.swift */; };
+		E980F0EC5DB0B0F30F7014A1 /* AlertChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ECE972ACD58B419F33FD5E9 /* AlertChip.swift */; };
+		EA63B737E3C57208E0F89088 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3090455A9A9799B96DDB3AE /* Models.swift */; };
+		F2D27BE80C7EE4C67F396AFF /* ScheduleViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8007BD81BA02CBDD6CE04D /* ScheduleViews.swift */; };
+		FD4666C93013D9B200FCAFF1 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD4666C83013D9B200FCAFF1 /* WidgetKit.framework */; };
+		FD4666CB3013D9B200FCAFF1 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD4666CA3013D9B200FCAFF1 /* SwiftUI.framework */; };
+		FD4666DA3013D9B300FCAFF1 /* ConAnimaWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FD4666C63013D9B200FCAFF1 /* ConAnimaWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FD4666D83013D9B300FCAFF1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72F35D6F144C85514CE7D2B8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FD4666C53013D9B200FCAFF1;
+			remoteInfo = ConAnimaWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FD4666DB3013D9B300FCAFF1 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				FD4666DA3013D9B300FCAFF1 /* ConAnimaWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0132E770BDFD7E1019F52EA0 /* DiaryDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DiaryDetailView.swift; sourceTree = "<group>"; };
+		A290B28C84B84371B92862AA /* PieceDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PieceDetailView.swift; sourceTree = "<group>"; };
+		16DAD1D26983CBD5895EE0A6 /* ConAnima.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ConAnima.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		19910EDCD5E1BCDBFF32A2B1 /* AppButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppButtons.swift; sourceTree = "<group>"; };
+		22D2793C48068D4BA70BE72D /* FormControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormControls.swift; sourceTree = "<group>"; };
+		34A8F25B8B717ACCADE5D062 /* HoldToAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoldToAction.swift; sourceTree = "<group>"; };
+		3513C45964D9BD35006F310F /* StudentFormSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentFormSheet.swift; sourceTree = "<group>"; };
+		36E75C2F639E043FFB65D26B /* AppViewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModels.swift; sourceTree = "<group>"; };
+		4D737C01D34258F99BF26C46 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		4ECE972ACD58B419F33FD5E9 /* AlertChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertChip.swift; sourceTree = "<group>"; };
+		523671251ACE68EA98D7D845 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		54E55C5715EDB2031A2A97DF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5752FCFF2E2804CFFE94D3FD /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		57620BE5FAD55BF6E9124F6A /* StudentRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentRowView.swift; sourceTree = "<group>"; };
+		5EA24A0F359C0BA6F6724611 /* AddMaterialSheets.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AddMaterialSheets.swift; sourceTree = "<group>"; };
+		6CDC0869FCA9CBC44A5CA3DF /* SummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryView.swift; sourceTree = "<group>"; };
+		6EA7B695B2EAE70156BADE94 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		7572275BC3C88972E14DA9E3 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		86E9B00EF393AFE56EEAAD08 /* StudentDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentDetailView.swift; sourceTree = "<group>"; };
+		92AEB509C4C285524B685693 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		9D8007BD81BA02CBDD6CE04D /* ScheduleViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleViews.swift; sourceTree = "<group>"; };
+		A063316C343AF9D1CADFB5FB /* RunningCat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningCat.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF02 /* PawBurst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PawBurst.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF04 /* LessonActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonActivityAttributes.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF06 /* LessonLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonLiveActivity.swift; sourceTree = "<group>"; };
+		AB80BAE3B66305B875A799F8 /* ConAnimaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConAnimaApp.swift; sourceTree = "<group>"; };
+		B71A9D8FC712605C8487A569 /* StudentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentsView.swift; sourceTree = "<group>"; };
+		C3E2925048B37FA113BF389C /* SlideToAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideToAction.swift; sourceTree = "<group>"; };
+		C6163A94B145B87613484E9D /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
+		E1F3CBFE96867649CCF8A9BA /* Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatters.swift; sourceTree = "<group>"; };
+		F3090455A9A9799B96DDB3AE /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		FD4666C63013D9B200FCAFF1 /* ConAnimaWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ConAnimaWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		FD4666C83013D9B200FCAFF1 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		FD4666CA3013D9B200FCAFF1 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		FF66562834403F6E9BFD1C5D /* NavigationRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRoutes.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		FD4666DE3013D9B300FCAFF1 /* Exceptions for "ConAnimaWidget" folder in "ConAnimaWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = FD4666C53013D9B200FCAFF1 /* ConAnimaWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		FD4666CC3013D9B200FCAFF1 /* ConAnimaWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				FD4666DE3013D9B300FCAFF1 /* Exceptions for "ConAnimaWidget" folder in "ConAnimaWidgetExtension" target */,
+			);
+			path = ConAnimaWidget;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FD4666C33013D9B200FCAFF1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FD4666CB3013D9B200FCAFF1 /* SwiftUI.framework in Frameworks */,
+				FD4666C93013D9B200FCAFF1 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		06A4B74BED060036825F770D = {
+			isa = PBXGroup;
+			children = (
+				701533F7996F4B97CFC7B1BB /* ConAnima */,
+				FD4666CC3013D9B200FCAFF1 /* ConAnimaWidget */,
+				FD4666C73013D9B200FCAFF1 /* Frameworks */,
+				8DD2970682C223310FF91034 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		09A07B1CC7A1D6BA31783223 /* Summary */ = {
+			isa = PBXGroup;
+			children = (
+				6CDC0869FCA9CBC44A5CA3DF /* SummaryView.swift */,
+			);
+			path = Summary;
+			sourceTree = "<group>";
+		};
+		1A20C8DF062CA2F1F9C7E055 /* Schedule */ = {
+			isa = PBXGroup;
+			children = (
+				C6163A94B145B87613484E9D /* JournalView.swift */,
+				9D8007BD81BA02CBDD6CE04D /* ScheduleViews.swift */,
+			);
+			path = Schedule;
+			sourceTree = "<group>";
+		};
+		26886C7B63E823542A2E79FE /* History */ = {
+			isa = PBXGroup;
+			children = (
+				6EA7B695B2EAE70156BADE94 /* HistoryView.swift */,
+			);
+			path = History;
+			sourceTree = "<group>";
+		};
+		2FE3A491E858FA31EF458EEF /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				36E75C2F639E043FFB65D26B /* AppViewModels.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		48B9E26B7313047BA0BEE435 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				523671251ACE68EA98D7D845 /* LoginView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		49ADD704A2B860414E5A8288 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				92AEB509C4C285524B685693 /* Theme.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		4FB7E84B3A3441E1090CE8CB /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				7572275BC3C88972E14DA9E3 /* MainTabView.swift */,
+				48B9E26B7313047BA0BEE435 /* Auth */,
+				26886C7B63E823542A2E79FE /* History */,
+				1A20C8DF062CA2F1F9C7E055 /* Schedule */,
+				F141AD7B3013C2EDF365AE4E /* Students */,
+				09A07B1CC7A1D6BA31783223 /* Summary */,
+				A634A0D902CD556B1A875CBD /* Diary */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		4FE468B4F7A0CB757B37E916 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F3090455A9A9799B96DDB3AE /* Models.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5442F0735EC1B8FB3174A7D1 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				4ECE972ACD58B419F33FD5E9 /* AlertChip.swift */,
+				19910EDCD5E1BCDBFF32A2B1 /* AppButtons.swift */,
+				22D2793C48068D4BA70BE72D /* FormControls.swift */,
+				34A8F25B8B717ACCADE5D062 /* HoldToAction.swift */,
+				AA11BB22CC33DD44EE55FF02 /* PawBurst.swift */,
+				A063316C343AF9D1CADFB5FB /* RunningCat.swift */,
+				C3E2925048B37FA113BF389C /* SlideToAction.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		701533F7996F4B97CFC7B1BB /* ConAnima */ = {
+			isa = PBXGroup;
+			children = (
+				54E55C5715EDB2031A2A97DF /* Assets.xcassets */,
+				AB80BAE3B66305B875A799F8 /* ConAnimaApp.swift */,
+				4D737C01D34258F99BF26C46 /* Info.plist */,
+				5442F0735EC1B8FB3174A7D1 /* Components */,
+				AA11BB22CC33DD44EE55FF07 /* LiveActivity */,
+				4FE468B4F7A0CB757B37E916 /* Models */,
+				DEF223C1BC8E46DF529EA7B7 /* Services */,
+				49ADD704A2B860414E5A8288 /* Theme */,
+				A1849E52724C9550E6181701 /* Utilities */,
+				2FE3A491E858FA31EF458EEF /* ViewModels */,
+				4FB7E84B3A3441E1090CE8CB /* Views */,
+			);
+			path = ConAnima;
+			sourceTree = "<group>";
+		};
+		8DD2970682C223310FF91034 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				16DAD1D26983CBD5895EE0A6 /* ConAnima.app */,
+				FD4666C63013D9B200FCAFF1 /* ConAnimaWidgetExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A1849E52724C9550E6181701 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				E1F3CBFE96867649CCF8A9BA /* Formatters.swift */,
+				FF66562834403F6E9BFD1C5D /* NavigationRoutes.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		A634A0D902CD556B1A875CBD /* Diary */ = {
+			isa = PBXGroup;
+			children = (
+				0132E770BDFD7E1019F52EA0 /* DiaryDetailView.swift */,
+				A290B28C84B84371B92862AA /* PieceDetailView.swift */,
+				5EA24A0F359C0BA6F6724611 /* AddMaterialSheets.swift */,
+			);
+			name = Diary;
+			path = Diary;
+			sourceTree = "<group>";
+		};
+		AA11BB22CC33DD44EE55FF07 /* LiveActivity */ = {
+			isa = PBXGroup;
+			children = (
+				AA11BB22CC33DD44EE55FF04 /* LessonActivityAttributes.swift */,
+				AA11BB22CC33DD44EE55FF06 /* LessonLiveActivity.swift */,
+			);
+			path = LiveActivity;
+			sourceTree = "<group>";
+		};
+		DEF223C1BC8E46DF529EA7B7 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				5752FCFF2E2804CFFE94D3FD /* APIClient.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		F141AD7B3013C2EDF365AE4E /* Students */ = {
+			isa = PBXGroup;
+			children = (
+				86E9B00EF393AFE56EEAAD08 /* StudentDetailView.swift */,
+				3513C45964D9BD35006F310F /* StudentFormSheet.swift */,
+				57620BE5FAD55BF6E9124F6A /* StudentRowView.swift */,
+				B71A9D8FC712605C8487A569 /* StudentsView.swift */,
+			);
+			path = Students;
+			sourceTree = "<group>";
+		};
+		FD4666C73013D9B200FCAFF1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FD4666C83013D9B200FCAFF1 /* WidgetKit.framework */,
+				FD4666CA3013D9B200FCAFF1 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F8F21A936E394BFD24429E22 /* ConAnima */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A30B41A53EC869E3871F10C5 /* Build configuration list for PBXNativeTarget "ConAnima" */;
+			buildPhases = (
+				3D371AE5447214D45BAFE203 /* Sources */,
+				72379A34FB1CE58F07AF3BFA /* Resources */,
+				FD4666DB3013D9B300FCAFF1 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FD4666D93013D9B300FCAFF1 /* PBXTargetDependency */,
+			);
+			name = ConAnima;
+			productName = ConAnima;
+			productReference = 16DAD1D26983CBD5895EE0A6 /* ConAnima.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FD4666C53013D9B200FCAFF1 /* ConAnimaWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FD4666DF3013D9B300FCAFF1 /* Build configuration list for PBXNativeTarget "ConAnimaWidgetExtension" */;
+			buildPhases = (
+				FD4666C23013D9B200FCAFF1 /* Sources */,
+				FD4666C33013D9B200FCAFF1 /* Frameworks */,
+				FD4666C43013D9B200FCAFF1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				FD4666CC3013D9B200FCAFF1 /* ConAnimaWidget */,
+			);
+			name = ConAnimaWidgetExtension;
+			productName = ConAnimaWidgetExtension;
+			productReference = FD4666C63013D9B200FCAFF1 /* ConAnimaWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		72F35D6F144C85514CE7D2B8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					FD4666C53013D9B200FCAFF1 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+				};
+			};
+			buildConfigurationList = 4C73303D683BC8866C6E960F /* Build configuration list for PBXProject "ConAnima" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 06A4B74BED060036825F770D;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 8DD2970682C223310FF91034 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F8F21A936E394BFD24429E22 /* ConAnima */,
+				FD4666C53013D9B200FCAFF1 /* ConAnimaWidgetExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		72379A34FB1CE58F07AF3BFA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0A76B9BD2FB52ED753787B1E /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FD4666C43013D9B200FCAFF1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3D371AE5447214D45BAFE203 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E678DB06EB4531240DF90065 /* APIClient.swift in Sources */,
+				E980F0EC5DB0B0F30F7014A1 /* AlertChip.swift in Sources */,
+				8CA6310086921FBE5450D1AA /* AppButtons.swift in Sources */,
+				87E1D5926D2440781DD7E95E /* AppViewModels.swift in Sources */,
+				DD1DF9506C9DE80071DAE55B /* ConAnimaApp.swift in Sources */,
+				8FC33B570F37106B2ACC134F /* FormControls.swift in Sources */,
+				DAB9699068DB6AFEFD9AE66A /* Formatters.swift in Sources */,
+				43BF4CC6931BD2EA72FBD91E /* HistoryView.swift in Sources */,
+				CB1BB65A5B779B221B6FF2C6 /* HoldToAction.swift in Sources */,
+				BCACFB21DE7013E49AF6FA99 /* JournalView.swift in Sources */,
+				AA11BB22CC33DD44EE55FF03 /* LessonActivityAttributes.swift in Sources */,
+				AA11BB22CC33DD44EE55FF05 /* LessonLiveActivity.swift in Sources */,
+				AA11BB22CC33DD44EE55FF01 /* PawBurst.swift in Sources */,
+				B216D98B9559CCD845B8CEB0 /* LoginView.swift in Sources */,
+				77B82CE4C31270CE242AB124 /* MainTabView.swift in Sources */,
+				EA63B737E3C57208E0F89088 /* Models.swift in Sources */,
+				9D45B4FAA0A6B4CD239AD043 /* NavigationRoutes.swift in Sources */,
+				B8FD7C097FD0D84C3A3228A2 /* RunningCat.swift in Sources */,
+				F2D27BE80C7EE4C67F396AFF /* ScheduleViews.swift in Sources */,
+				4088751F03523C1739E4C671 /* SlideToAction.swift in Sources */,
+				34E77E1C463B069A00ECE47C /* StudentDetailView.swift in Sources */,
+				BBA7632D75386F17CABB5679 /* StudentFormSheet.swift in Sources */,
+				90AFD47AD6AF83E6F3FFB44B /* StudentRowView.swift in Sources */,
+				D44C24B2759F9784EE57AC2D /* StudentsView.swift in Sources */,
+				DBB356AE2A8EF705C618FBFC /* SummaryView.swift in Sources */,
+				A71B9FFB464577693D9DE4D9 /* Theme.swift in Sources */,
+				C056A279D52C35F1F264F072 /* DiaryDetailView.swift in Sources */,
+				CB118AF9E2E44B61A05B9033 /* PieceDetailView.swift in Sources */,
+				30926CAE39B67FAE0C2C1047 /* AddMaterialSheets.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FD4666C23013D9B200FCAFF1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FD4666D93013D9B300FCAFF1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FD4666C53013D9B200FCAFF1 /* ConAnimaWidgetExtension */;
+			targetProxy = FD4666D83013D9B300FCAFF1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		13C6E529693DBC2B72A5FACF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = ASYB7Y6H57;
+				INFOPLIST_FILE = ConAnima/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6C240A7F4906C8F47A76B090 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = ConAnima/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.conanima.cabinet;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		D4403D581A0EE126F7CD6BC1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = ASYB7Y6H57;
+				INFOPLIST_FILE = ConAnima/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E9DA08536D65333A00F0D2F0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = ConAnima/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.conanima.cabinet;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		FD4666DC3013D9B300FCAFF1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ASYB7Y6H57;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ConAnimaWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ConAnimaWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.conanima.cabinet.ConAnimaWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FD4666DD3013D9B300FCAFF1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ASYB7Y6H57;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ConAnimaWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ConAnimaWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.conanima.cabinet.ConAnimaWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4C73303D683BC8866C6E960F /* Build configuration list for PBXProject "ConAnima" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6C240A7F4906C8F47A76B090 /* Debug */,
+				E9DA08536D65333A00F0D2F0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A30B41A53EC869E3871F10C5 /* Build configuration list for PBXNativeTarget "ConAnima" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				13C6E529693DBC2B72A5FACF /* Debug */,
+				D4403D581A0EE126F7CD6BC1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FD4666DF3013D9B300FCAFF1 /* Build configuration list for PBXNativeTarget "ConAnimaWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FD4666DC3013D9B300FCAFF1 /* Debug */,
+				FD4666DD3013D9B300FCAFF1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 72F35D6F144C85514CE7D2B8 /* Project object */;
+}

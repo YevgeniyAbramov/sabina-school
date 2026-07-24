@@ -1,0 +1,4 @@
+.derivedData/
+*.xcuserstate
+xcuserdata/
+DerivedData/

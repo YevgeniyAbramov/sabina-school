@@ -27,6 +27,16 @@ export const copy = {
   filterAll: 'Все',
   filterPaid: 'Оплачено',
   filterUnpaid: 'Не оплачено',
+  filterEndingSoon: 'Заканчивается',
+  filterFinished: 'Закончился',
+  filterEmpty: 'По этому фильтру пусто',
+  filterEmptyHint: 'Сбросьте фильтр или добавьте нового',
+  filterShowAll: 'Показать всех',
+
+  searchPlaceholder: 'Поиск по имени…',
+  searchEmpty: 'Никого не нашли',
+  searchEmptyHint: 'Попробуйте другое имя или сбросьте поиск',
+  searchClear: 'Сбросить поиск',
 
   paidToggleOn: 'Оплачен',
   paidToggleOff: 'Не оплачен',

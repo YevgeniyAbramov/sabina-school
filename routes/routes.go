@@ -11,13 +11,21 @@ func Use(app *fiber.App,
 	studentHandler *handler.StudentHandler,
 	authHandler *handler.AuthHandler,
 	monthlySummaryHandler *handler.MonthlySummaryHandler,
-	scheduleHandler *handler.StudentScheduleHandler) {
+	scheduleHandler *handler.StudentScheduleHandler,
+	activityHandler *handler.ActivityHandler,
+	materialHandler *handler.StudentMaterialHandler,
+	pieceHandler *handler.StudentPieceHandler,
+	diaryShareHandler *handler.DiaryShareHandler) {
 
 	app.Get("/status", handler.CheckStatus)
+
+	// Public parent page (no auth) — must be registered before SPA static.
+	app.Get("/share/diary/:token", diaryShareHandler.PublicPage)
+
 	api := app.Group("/api/v1/")
-	// Публичные роуты (без авторизации)
 	api.Post("/auth/login", authHandler.Login)
-	// Защищенные роуты (требуют токен)
+	api.Get("/public/diary/:token", diaryShareHandler.PublicJSON)
+
 	protected := api.Group("/", middleware.AuthRequired())
 
 	protected.Post("/students", studentHandler.CreateStudent)
@@ -33,4 +41,21 @@ func Use(app *fiber.App,
 	protected.Get("/schedule", scheduleHandler.GetByTeacherAndDay)
 
 	protected.Get("/monthly-summary", monthlySummaryHandler.GetMonthlySummary)
+	protected.Get("/activity", activityHandler.List)
+
+	protected.Get("/student/:id/materials", materialHandler.List)
+	protected.Post("/student/:id/materials/link", materialHandler.CreateLink)
+	protected.Post("/student/:id/materials/file", materialHandler.CreateFile)
+	protected.Put("/student/:id/materials/:materialId", materialHandler.Update)
+	protected.Delete("/student/:id/materials/:materialId", materialHandler.Delete)
+
+	protected.Get("/student/:id/pieces", pieceHandler.List)
+	protected.Post("/student/:id/pieces", pieceHandler.Create)
+	protected.Get("/student/:id/pieces/:pieceId", pieceHandler.Get)
+	protected.Put("/student/:id/pieces/:pieceId", pieceHandler.Update)
+	protected.Delete("/student/:id/pieces/:pieceId", pieceHandler.Delete)
+	protected.Post("/student/:id/pieces/:pieceId/notes", pieceHandler.AddNote)
+	protected.Delete("/student/:id/pieces/:pieceId/notes/:noteId", pieceHandler.DeleteNote)
+
+	protected.Post("/student/:id/diary-share", diaryShareHandler.Create)
 }

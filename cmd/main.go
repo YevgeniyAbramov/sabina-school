@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"context"
 	"sckool/auth"
 	"sckool/db"
 	handler "sckool/handlers"
@@ -36,6 +37,19 @@ func main() {
 	services := service.NewServices(repos)
 	handlers := handler.NewHandlers(services)
 
+	if err := services.Activity.EnsureSchema(context.Background()); err != nil {
+		log.Printf("Warning: activity schema: %v", err)
+	}
+	if err := repos.StudentMaterial.EnsureSchema(context.Background()); err != nil {
+		log.Printf("Warning: student_material schema: %v", err)
+	}
+	if err := repos.StudentPiece.EnsureSchema(context.Background()); err != nil {
+		log.Printf("Warning: student_piece schema: %v", err)
+	}
+	if err := repos.DiaryShare.EnsureSchema(context.Background()); err != nil {
+		log.Printf("Warning: diary_share schema: %v", err)
+	}
+
 	esURL := os.Getenv("ELASTICSEARCH_URL")
 	esUsername := os.Getenv("ELASTICSEARCH_USERNAME")
 	esPassword := os.Getenv("ELASTICSEARCH_PASSWORD")
@@ -62,7 +76,13 @@ func main() {
 	app.Use(logger.New())
 
 	// API сначала — не перехватывается статикой
-	routes.Use(app, handlers.Student, handlers.Auth, handlers.MonthlySummary, handlers.StudentSchedule)
+	routes.Use(app, handlers.Student, handlers.Auth, handlers.MonthlySummary, handlers.StudentSchedule, handlers.Activity, handlers.StudentMaterial, handlers.StudentPiece, handlers.DiaryShare)
+
+	uploadRoot := resolveUploadRoot()
+	if err := os.MkdirAll(uploadRoot, 0o755); err != nil {
+		log.Printf("Warning: could not create upload dir %s: %v", uploadRoot, err)
+	}
+	app.Static("/uploads", uploadRoot)
 
 	webRoot := resolveWebRoot()
 	indexHTML := filepath.Join(webRoot, "index.html")
@@ -92,4 +112,11 @@ func resolveWebRoot() string {
 	}
 	log.Println("Warning: web2/dist not found, falling back to ./public")
 	return "./public"
+}
+
+func resolveUploadRoot() string {
+	if v := os.Getenv("UPLOAD_ROOT"); v != "" {
+		return v
+	}
+	return "./uploads"
 }
