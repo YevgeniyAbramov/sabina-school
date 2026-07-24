@@ -18,6 +18,8 @@ services:
       - ELASTICSEARCH_URL=http://${es_host}:${es_port}
       - ELASTICSEARCH_USERNAME=${es_username}
       - ELASTICSEARCH_PASSWORD=${es_password}
+    volumes:
+      - uploads_data:/app/uploads
     depends_on:
       db:
         condition: service_started
@@ -80,6 +82,9 @@ volumes:
     driver: local
 
   elasticsearch_data:
+    driver: local
+
+  uploads_data:
     driver: local
 
 networks:

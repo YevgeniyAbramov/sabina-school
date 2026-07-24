@@ -12,7 +12,8 @@ func Use(app *fiber.App,
 	authHandler *handler.AuthHandler,
 	monthlySummaryHandler *handler.MonthlySummaryHandler,
 	scheduleHandler *handler.StudentScheduleHandler,
-	activityHandler *handler.ActivityHandler) {
+	activityHandler *handler.ActivityHandler,
+	materialHandler *handler.StudentMaterialHandler) {
 
 	app.Get("/status", handler.CheckStatus)
 	api := app.Group("/api/v1/")
@@ -35,4 +36,10 @@ func Use(app *fiber.App,
 
 	protected.Get("/monthly-summary", monthlySummaryHandler.GetMonthlySummary)
 	protected.Get("/activity", activityHandler.List)
+
+	protected.Get("/student/:id/materials", materialHandler.List)
+	protected.Post("/student/:id/materials/link", materialHandler.CreateLink)
+	protected.Post("/student/:id/materials/file", materialHandler.CreateFile)
+	protected.Put("/student/:id/materials/:materialId", materialHandler.Update)
+	protected.Delete("/student/:id/materials/:materialId", materialHandler.Delete)
 }

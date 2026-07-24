@@ -10,6 +10,7 @@ type Services struct {
 	MonthlySummary  *MonthlySummaryService
 	StudentSchedule *StudentScheduleService
 	Activity        *ActivityService
+	StudentMaterial *StudentMaterialService
 }
 
 func NewServices(repos *db.Repositories) *Services {
@@ -22,5 +23,6 @@ func NewServices(repos *db.Repositories) *Services {
 		MonthlySummary:  monthlySummaryService,
 		StudentSchedule: NewStudentScheduleService(repos.StudentSchedule, repos.Student),
 		Activity:        activityService,
+		StudentMaterial: NewStudentMaterialService(repos.StudentMaterial, repos.Student),
 	}
 }

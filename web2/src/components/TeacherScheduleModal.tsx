@@ -137,8 +137,8 @@ export function TeacherScheduleModal({
         </p>
       ) : (
         <div>
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <p className="text-sm text-muted-foreground">
+          <div className="mb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <p className="text-sm text-muted-foreground order-2 sm:order-1">
               Нажмите на день, чтобы раскрыть список
             </p>
             <Button
@@ -146,7 +146,7 @@ export function TeacherScheduleModal({
               variant="outline"
               size="sm"
               onClick={() => exportWeekScheduleImage(days, students)}
-              className="gap-1.5"
+              className="w-full sm:w-auto gap-1.5 order-1 sm:order-2"
             >
               <Download size={15} /> Скачать картинку
             </Button>
