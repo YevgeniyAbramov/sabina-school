@@ -43,6 +43,9 @@ func main() {
 	if err := repos.StudentMaterial.EnsureSchema(context.Background()); err != nil {
 		log.Printf("Warning: student_material schema: %v", err)
 	}
+	if err := repos.StudentPiece.EnsureSchema(context.Background()); err != nil {
+		log.Printf("Warning: student_piece schema: %v", err)
+	}
 
 	esURL := os.Getenv("ELASTICSEARCH_URL")
 	esUsername := os.Getenv("ELASTICSEARCH_USERNAME")
@@ -70,7 +73,7 @@ func main() {
 	app.Use(logger.New())
 
 	// API сначала — не перехватывается статикой
-	routes.Use(app, handlers.Student, handlers.Auth, handlers.MonthlySummary, handlers.StudentSchedule, handlers.Activity, handlers.StudentMaterial)
+	routes.Use(app, handlers.Student, handlers.Auth, handlers.MonthlySummary, handlers.StudentSchedule, handlers.Activity, handlers.StudentMaterial, handlers.StudentPiece)
 
 	uploadRoot := resolveUploadRoot()
 	if err := os.MkdirAll(uploadRoot, 0o755); err != nil {

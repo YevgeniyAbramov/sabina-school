@@ -199,6 +199,10 @@ struct StudentDetailView: View {
             detailLink(title: "Расписание", systemImage: "calendar") {
                 showSchedule = true
             }
+            NavigationLink(value: StudentRoute.diary(studentId)) {
+                detailLinkLabel(title: "Дневник", systemImage: "music.note.list")
+            }
+            .buttonStyle(.plain)
             detailLink(title: "Продлить", systemImage: "arrow.clockwise") {
                 showRenew = true
             }
@@ -236,27 +240,31 @@ struct StudentDetailView: View {
 
     private func detailLink(title: String, systemImage: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            HStack(spacing: 12) {
-                Image(systemName: systemImage)
-                    .frame(width: 28)
-                    .foregroundStyle(AppTheme.primary)
-                Text(title)
-                    .foregroundStyle(.primary)
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 14)
-            .background(
-                Color(.secondarySystemGroupedBackground),
-                in: RoundedRectangle(cornerRadius: 12, style: .continuous)
-            )
-            .shadow(color: .black.opacity(0.04), radius: 6, y: 2)
-            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            detailLinkLabel(title: title, systemImage: systemImage)
         }
         .buttonStyle(.plain)
+    }
+
+    private func detailLinkLabel(title: String, systemImage: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .frame(width: 28)
+                .foregroundStyle(AppTheme.primary)
+            Text(title)
+                .foregroundStyle(.primary)
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 14)
+        .background(
+            Color(.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+        )
+        .shadow(color: .black.opacity(0.04), radius: 6, y: 2)
+        .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private func remainingColor(_ student: Student) -> Color {

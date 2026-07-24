@@ -7,6 +7,7 @@ type Repositories struct {
 	StudentSchedule StudentScheduleRepository
 	Activity        ActivityRepository
 	StudentMaterial StudentMaterialRepository
+	StudentPiece    StudentPieceRepository
 }
 
 func NewRepositories(db *Database) *Repositories {
@@ -17,5 +18,6 @@ func NewRepositories(db *Database) *Repositories {
 		StudentSchedule: NewStudentScheduleRepo(db),
 		Activity:        NewActivityRepo(db),
 		StudentMaterial: NewStudentMaterialRepo(db),
+		StudentPiece:    NewStudentPieceRepo(db),
 	}
 }

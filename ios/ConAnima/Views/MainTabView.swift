@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum MainTab: Hashable {
-    case students, history, journal, diary, summary
+    case students, history, journal, summary
 }
 
 struct MainTabView: View {
@@ -23,10 +23,6 @@ struct MainTabView: View {
             JournalView()
                 .tabItem { Label("Журнал", systemImage: "book.pages.fill") }
                 .tag(MainTab.journal)
-
-            DiaryView()
-                .tabItem { Label("Дневник", systemImage: "music.note.list") }
-                .tag(MainTab.diary)
 
             SummaryView()
                 .tabItem { Label("Итоги", systemImage: "chart.line.uptrend.xyaxis") }

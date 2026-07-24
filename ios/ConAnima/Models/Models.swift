@@ -201,12 +201,125 @@ enum MaterialKind: String, Codable {
     case file
 }
 
-/// One entry in a student's "Дневник" — either a link (YouTube etc.) or an
-/// uploaded file (sheet music scan/PDF). Mirrors `auth.student_material` on the backend.
+enum PieceStatus: String, Codable, CaseIterable, Identifiable {
+    case learning
+    case polished
+    case paused
+    case learned
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .learning: return "Учит"
+        case .polished: return "Шлифует"
+        case .paused: return "Пауза"
+        case .learned: return "Выучил"
+        }
+    }
+}
+
+/// Repertoire piece — container for notes, links and readiness.
+struct StudentPiece: Codable, Identifiable, Hashable {
+    let id: Int
+    var teacherId: Int
+    var studentId: Int
+    var title: String
+    var composer: String
+    var readiness: Int
+    var status: PieceStatus
+    var createdAt: String
+    var updatedAt: String
+    var notesCount: Int?
+    var materialsCount: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case teacherId = "teacher_id"
+        case studentId = "student_id"
+        case title, composer, readiness, status
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case notesCount = "notes_count"
+        case materialsCount = "materials_count"
+    }
+}
+
+struct StudentPieceNote: Codable, Identifiable, Hashable {
+    let id: Int
+    var pieceId: Int
+    var teacherId: Int
+    var studentId: Int
+    var body: String
+    var createdAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case pieceId = "piece_id"
+        case teacherId = "teacher_id"
+        case studentId = "student_id"
+        case body
+        case createdAt = "created_at"
+    }
+}
+
+struct PieceDetail: Codable, Identifiable, Hashable {
+    let id: Int
+    var teacherId: Int
+    var studentId: Int
+    var title: String
+    var composer: String
+    var readiness: Int
+    var status: PieceStatus
+    var createdAt: String
+    var updatedAt: String
+    var materials: [StudentMaterial]
+    var notes: [StudentPieceNote]
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case teacherId = "teacher_id"
+        case studentId = "student_id"
+        case title, composer, readiness, status
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case materials, notes
+    }
+
+    var asPiece: StudentPiece {
+        StudentPiece(
+            id: id,
+            teacherId: teacherId,
+            studentId: studentId,
+            title: title,
+            composer: composer,
+            readiness: readiness,
+            status: status,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            notesCount: notes.count,
+            materialsCount: materials.count
+        )
+    }
+}
+
+struct PieceInput: Codable {
+    var title: String
+    var composer: String
+    var readiness: Int?
+    var status: PieceStatus
+}
+
+struct PieceNoteInput: Codable {
+    var body: String
+}
+
+/// One entry under a piece — link or uploaded file (sheet music).
 struct StudentMaterial: Codable, Identifiable, Hashable {
     let id: Int
     var teacherId: Int
     var studentId: Int
+    var pieceId: Int?
     var kind: MaterialKind
     var title: String
     var url: String
@@ -219,6 +332,7 @@ struct StudentMaterial: Codable, Identifiable, Hashable {
         case id
         case teacherId = "teacher_id"
         case studentId = "student_id"
+        case pieceId = "piece_id"
         case kind, title, url
         case fileName = "file_name"
         case note
@@ -240,6 +354,12 @@ struct MaterialLinkInput: Codable {
     var title: String
     var url: String
     var note: String
+    var pieceId: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case title, url, note
+        case pieceId = "piece_id"
+    }
 }
 
 struct MaterialUpdateInput: Codable {

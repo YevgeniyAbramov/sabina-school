@@ -40,11 +40,13 @@ func (r *StudentMaterialRepo) EnsureSchema(ctx context.Context) error {
 			ON auth.student_material (student_id, created_at);
 		CREATE INDEX IF NOT EXISTS idx_student_material_teacher
 			ON auth.student_material (teacher_id);
+		ALTER TABLE auth.student_material
+			ADD COLUMN IF NOT EXISTS piece_id BIGINT;
 	`)
 	return err
 }
 
-const studentMaterialColumns = `id, teacher_id, student_id, kind, title, url, file_name, note, created_at, updated_at`
+const studentMaterialColumns = `id, teacher_id, student_id, piece_id, kind, title, url, file_name, note, created_at, updated_at`
 
 func (r *StudentMaterialRepo) ListByStudent(ctx context.Context, studentID, teacherID int) ([]models.StudentMaterial, error) {
 	var rows []models.StudentMaterial
@@ -66,10 +68,16 @@ func (r *StudentMaterialRepo) ListByStudent(ctx context.Context, studentID, teac
 func (r *StudentMaterialRepo) Create(ctx context.Context, m models.StudentMaterial) (*models.StudentMaterial, error) {
 	var result models.StudentMaterial
 	err := r.db.conn.QueryRowxContext(ctx, `
-		INSERT INTO auth.student_material (teacher_id, student_id, kind, title, url, file_name, note, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
-		RETURNING `+studentMaterialColumns, m.TeacherID, m.StudentID, m.Kind, m.Title, m.URL, m.FileName, m.Note,
+		INSERT INTO auth.student_material (teacher_id, student_id, piece_id, kind, title, url, file_name, note, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())
+		RETURNING `+studentMaterialColumns, m.TeacherID, m.StudentID, m.PieceID, m.Kind, m.Title, m.URL, m.FileName, m.Note,
 	).StructScan(&result)
+	if err == nil && m.PieceID != nil {
+		_, _ = r.db.conn.ExecContext(ctx, `
+			UPDATE auth.student_piece SET updated_at = NOW()
+			WHERE id = $1 AND student_id = $2 AND teacher_id = $3
+		`, *m.PieceID, m.StudentID, m.TeacherID)
+	}
 	return &result, err
 }
 

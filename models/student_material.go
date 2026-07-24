@@ -9,14 +9,13 @@ const (
 	MaterialKindFile MaterialKind = "file"
 )
 
-// StudentMaterial is one entry in a student's "program": either a link (e.g. a
-// YouTube recording) or an uploaded file (e.g. sheet music scan/PDF). Kept as a
-// single table with a `kind` discriminator so the list stays chronologically
-// ordered, but each kind carries only the fields relevant to it.
+// StudentMaterial is one entry under a repertoire piece: a link (e.g. YouTube)
+// or an uploaded file (sheet music scan/PDF).
 type StudentMaterial struct {
 	ID        int          `json:"id" db:"id"`
 	TeacherID int          `json:"teacher_id" db:"teacher_id"`
 	StudentID int          `json:"student_id" db:"student_id"`
+	PieceID   *int         `json:"piece_id" db:"piece_id"`
 	Kind      MaterialKind `json:"kind" db:"kind"`
 	Title     string       `json:"title" db:"title"`
 	URL       string       `json:"url" db:"url"`
@@ -27,9 +26,10 @@ type StudentMaterial struct {
 }
 
 type MaterialLinkInput struct {
-	Title string `json:"title"`
-	URL   string `json:"url"`
-	Note  string `json:"note"`
+	Title   string `json:"title"`
+	URL     string `json:"url"`
+	Note    string `json:"note"`
+	PieceID *int   `json:"piece_id"`
 }
 
 type MaterialUpdateInput struct {

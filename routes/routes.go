@@ -13,7 +13,8 @@ func Use(app *fiber.App,
 	monthlySummaryHandler *handler.MonthlySummaryHandler,
 	scheduleHandler *handler.StudentScheduleHandler,
 	activityHandler *handler.ActivityHandler,
-	materialHandler *handler.StudentMaterialHandler) {
+	materialHandler *handler.StudentMaterialHandler,
+	pieceHandler *handler.StudentPieceHandler) {
 
 	app.Get("/status", handler.CheckStatus)
 	api := app.Group("/api/v1/")
@@ -42,4 +43,12 @@ func Use(app *fiber.App,
 	protected.Post("/student/:id/materials/file", materialHandler.CreateFile)
 	protected.Put("/student/:id/materials/:materialId", materialHandler.Update)
 	protected.Delete("/student/:id/materials/:materialId", materialHandler.Delete)
+
+	protected.Get("/student/:id/pieces", pieceHandler.List)
+	protected.Post("/student/:id/pieces", pieceHandler.Create)
+	protected.Get("/student/:id/pieces/:pieceId", pieceHandler.Get)
+	protected.Put("/student/:id/pieces/:pieceId", pieceHandler.Update)
+	protected.Delete("/student/:id/pieces/:pieceId", pieceHandler.Delete)
+	protected.Post("/student/:id/pieces/:pieceId/notes", pieceHandler.AddNote)
+	protected.Delete("/student/:id/pieces/:pieceId/notes/:noteId", pieceHandler.DeleteNote)
 }

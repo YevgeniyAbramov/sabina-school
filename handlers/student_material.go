@@ -107,8 +107,14 @@ func (h *StudentMaterialHandler) CreateFile(c *fiber.Ctx) error {
 	fileURL := fmt.Sprintf("%s/%d/%d/%s", materialURLPrefix, teacherID, studentID, storedName)
 	title := c.FormValue("title")
 	note := c.FormValue("note")
+	var pieceID *int
+	if raw := strings.TrimSpace(c.FormValue("piece_id")); raw != "" {
+		if id, err := strconv.Atoi(raw); err == nil {
+			pieceID = &id
+		}
+	}
 
-	data, err := h.service.CreateFile(c.Context(), studentID, teacherID, title, note, fileURL, fileHeader.Filename)
+	data, err := h.service.CreateFile(c.Context(), studentID, teacherID, title, note, fileURL, fileHeader.Filename, pieceID)
 	if err != nil {
 		_ = os.Remove(diskPath)
 		return c.JSON(fiber.Map{"status": false, "message": err.Error()})

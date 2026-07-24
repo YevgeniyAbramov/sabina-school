@@ -44,6 +44,10 @@ struct StudentsView: View {
                 switch route {
                 case .detail(let id):
                     StudentDetailView(vm: vm, studentId: id)
+                case .diary(let id):
+                    DiaryDetailView(studentId: id)
+                case .piece(let studentId, let pieceId):
+                    PieceDetailView(studentId: studentId, pieceId: pieceId)
                 }
             }
             .toolbar {

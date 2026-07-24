@@ -62,6 +62,7 @@ func (s *StudentMaterialService) CreateLink(ctx context.Context, studentID, teac
 	return s.materialRepo.Create(ctx, models.StudentMaterial{
 		TeacherID: teacherID,
 		StudentID: studentID,
+		PieceID:   input.PieceID,
 		Kind:      models.MaterialKindLink,
 		Title:     title,
 		URL:       url,
@@ -72,7 +73,7 @@ func (s *StudentMaterialService) CreateLink(ctx context.Context, studentID, teac
 // CreateFile expects the file to already be saved to disk by the handler (which
 // owns the fiber-specific multipart parsing); this keeps the service focused on
 // validation + persistence.
-func (s *StudentMaterialService) CreateFile(ctx context.Context, studentID, teacherID int, title, note, fileURL, fileName string) (*models.StudentMaterial, error) {
+func (s *StudentMaterialService) CreateFile(ctx context.Context, studentID, teacherID int, title, note, fileURL, fileName string, pieceID *int) (*models.StudentMaterial, error) {
 	if err := s.ensureStudent(ctx, studentID, teacherID); err != nil {
 		return nil, err
 	}
@@ -88,6 +89,7 @@ func (s *StudentMaterialService) CreateFile(ctx context.Context, studentID, teac
 	return s.materialRepo.Create(ctx, models.StudentMaterial{
 		TeacherID: teacherID,
 		StudentID: studentID,
+		PieceID:   pieceID,
 		Kind:      models.MaterialKindFile,
 		Title:     title,
 		URL:       fileURL,

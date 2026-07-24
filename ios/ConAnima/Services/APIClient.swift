@@ -343,11 +343,16 @@ enum API {
         note: String,
         fileName: String,
         mimeType: String,
-        fileData: Data
+        fileData: Data,
+        pieceId: Int? = nil
     ) async throws -> StudentMaterial {
+        var fields = ["title": title, "note": note]
+        if let pieceId {
+            fields["piece_id"] = String(pieceId)
+        }
         let r: ApiResponse<StudentMaterial> = try await APIClient.shared.uploadMultipart(
             "/student/\(studentId)/materials/file",
-            fields: ["title": title, "note": note],
+            fields: fields,
             fileField: "file",
             fileName: fileName,
             mimeType: mimeType,
@@ -374,6 +379,70 @@ enum API {
             "/student/\(studentId)/materials/\(materialId)", method: "DELETE"
         )
         guard r.status else { throw APIError.message(r.message ?? "Не удалось удалить") }
+    }
+
+    static func pieces(studentId: Int) async throws -> [StudentPiece] {
+        let r: ApiResponse<[StudentPiece]> = try await APIClient.shared.request(
+            "/student/\(studentId)/pieces"
+        )
+        guard r.status else { throw APIError.message(r.message ?? "Не удалось загрузить произведения") }
+        return r.data ?? []
+    }
+
+    static func piece(studentId: Int, pieceId: Int) async throws -> PieceDetail {
+        let r: ApiResponse<PieceDetail> = try await APIClient.shared.request(
+            "/student/\(studentId)/pieces/\(pieceId)"
+        )
+        guard r.status, let data = r.data else {
+            throw APIError.message(r.message ?? "Не удалось загрузить произведение")
+        }
+        return data
+    }
+
+    static func createPiece(studentId: Int, _ input: PieceInput) async throws -> StudentPiece {
+        let r: ApiResponse<StudentPiece> = try await APIClient.shared.request(
+            "/student/\(studentId)/pieces", method: "POST", body: input
+        )
+        guard r.status, let data = r.data else {
+            throw APIError.message(r.message ?? "Не удалось создать произведение")
+        }
+        return data
+    }
+
+    static func updatePiece(studentId: Int, pieceId: Int, _ input: PieceInput) async throws -> StudentPiece {
+        let r: ApiResponse<StudentPiece> = try await APIClient.shared.request(
+            "/student/\(studentId)/pieces/\(pieceId)", method: "PUT", body: input
+        )
+        guard r.status, let data = r.data else {
+            throw APIError.message(r.message ?? "Не удалось сохранить")
+        }
+        return data
+    }
+
+    static func deletePiece(studentId: Int, pieceId: Int) async throws {
+        let r: ApiResponse<IgnoredData> = try await APIClient.shared.request(
+            "/student/\(studentId)/pieces/\(pieceId)", method: "DELETE"
+        )
+        guard r.status else { throw APIError.message(r.message ?? "Не удалось удалить") }
+    }
+
+    static func addPieceNote(studentId: Int, pieceId: Int, body: String) async throws -> StudentPieceNote {
+        let r: ApiResponse<StudentPieceNote> = try await APIClient.shared.request(
+            "/student/\(studentId)/pieces/\(pieceId)/notes",
+            method: "POST",
+            body: PieceNoteInput(body: body)
+        )
+        guard r.status, let data = r.data else {
+            throw APIError.message(r.message ?? "Не удалось добавить заметку")
+        }
+        return data
+    }
+
+    static func deletePieceNote(studentId: Int, pieceId: Int, noteId: Int) async throws {
+        let r: ApiResponse<IgnoredData> = try await APIClient.shared.request(
+            "/student/\(studentId)/pieces/\(pieceId)/notes/\(noteId)", method: "DELETE"
+        )
+        guard r.status else { throw APIError.message(r.message ?? "Не удалось удалить заметку") }
     }
 }
 

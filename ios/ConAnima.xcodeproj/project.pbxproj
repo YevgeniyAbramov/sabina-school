@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0A76B9BD2FB52ED753787B1E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54E55C5715EDB2031A2A97DF /* Assets.xcassets */; };
+		30926CAE39B67FAE0C2C1047 /* AddMaterialSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA24A0F359C0BA6F6724611 /* AddMaterialSheets.swift */; };
 		34E77E1C463B069A00ECE47C /* StudentDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86E9B00EF393AFE56EEAAD08 /* StudentDetailView.swift */; };
 		4088751F03523C1739E4C671 /* SlideToAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E2925048B37FA113BF389C /* SlideToAction.swift */; };
 		43BF4CC6931BD2EA72FBD91E /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EA7B695B2EAE70156BADE94 /* HistoryView.swift */; };
@@ -25,6 +26,7 @@
 		B8FD7C097FD0D84C3A3228A2 /* RunningCat.swift in Sources */ = {isa = PBXBuildFile; fileRef = A063316C343AF9D1CADFB5FB /* RunningCat.swift */; };
 		BBA7632D75386F17CABB5679 /* StudentFormSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3513C45964D9BD35006F310F /* StudentFormSheet.swift */; };
 		BCACFB21DE7013E49AF6FA99 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6163A94B145B87613484E9D /* JournalView.swift */; };
+		C056A279D52C35F1F264F072 /* DiaryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0132E770BDFD7E1019F52EA0 /* DiaryDetailView.swift */; };
 		CB1BB65A5B779B221B6FF2C6 /* HoldToAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A8F25B8B717ACCADE5D062 /* HoldToAction.swift */; };
 		D44C24B2759F9784EE57AC2D /* StudentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B71A9D8FC712605C8487A569 /* StudentsView.swift */; };
 		DAB9699068DB6AFEFD9AE66A /* Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F3CBFE96867649CCF8A9BA /* Formatters.swift */; };
@@ -64,6 +66,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0132E770BDFD7E1019F52EA0 /* DiaryDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DiaryDetailView.swift; sourceTree = "<group>"; };
 		16DAD1D26983CBD5895EE0A6 /* ConAnima.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ConAnima.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		19910EDCD5E1BCDBFF32A2B1 /* AppButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppButtons.swift; sourceTree = "<group>"; };
 		22D2793C48068D4BA70BE72D /* FormControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormControls.swift; sourceTree = "<group>"; };
@@ -76,6 +79,7 @@
 		54E55C5715EDB2031A2A97DF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5752FCFF2E2804CFFE94D3FD /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		57620BE5FAD55BF6E9124F6A /* StudentRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentRowView.swift; sourceTree = "<group>"; };
+		5EA24A0F359C0BA6F6724611 /* AddMaterialSheets.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AddMaterialSheets.swift; sourceTree = "<group>"; };
 		6CDC0869FCA9CBC44A5CA3DF /* SummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryView.swift; sourceTree = "<group>"; };
 		6EA7B695B2EAE70156BADE94 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		7572275BC3C88972E14DA9E3 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
@@ -200,6 +204,7 @@
 				1A20C8DF062CA2F1F9C7E055 /* Schedule */,
 				F141AD7B3013C2EDF365AE4E /* Students */,
 				09A07B1CC7A1D6BA31783223 /* Summary */,
+				A634A0D902CD556B1A875CBD /* Diary */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -262,6 +267,16 @@
 			path = Utilities;
 			sourceTree = "<group>";
 		};
+		A634A0D902CD556B1A875CBD /* Diary */ = {
+			isa = PBXGroup;
+			children = (
+				0132E770BDFD7E1019F52EA0 /* DiaryDetailView.swift */,
+				5EA24A0F359C0BA6F6724611 /* AddMaterialSheets.swift */,
+			);
+			name = Diary;
+			path = Diary;
+			sourceTree = "<group>";
+		};
 		AA11BB22CC33DD44EE55FF07 /* LiveActivity */ = {
 			isa = PBXGroup;
 			children = (
@@ -316,8 +331,6 @@
 				FD4666D93013D9B300FCAFF1 /* PBXTargetDependency */,
 			);
 			name = ConAnima;
-			packageProductDependencies = (
-			);
 			productName = ConAnima;
 			productReference = 16DAD1D26983CBD5895EE0A6 /* ConAnima.app */;
 			productType = "com.apple.product-type.application";
@@ -338,8 +351,6 @@
 				FD4666CC3013D9B200FCAFF1 /* ConAnimaWidget */,
 			);
 			name = ConAnimaWidgetExtension;
-			packageProductDependencies = (
-			);
 			productName = ConAnimaWidgetExtension;
 			productReference = FD4666C63013D9B200FCAFF1 /* ConAnimaWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -428,6 +439,8 @@
 				D44C24B2759F9784EE57AC2D /* StudentsView.swift in Sources */,
 				DBB356AE2A8EF705C618FBFC /* SummaryView.swift in Sources */,
 				A71B9FFB464577693D9DE4D9 /* Theme.swift in Sources */,
+				C056A279D52C35F1F264F072 /* DiaryDetailView.swift in Sources */,
+				30926CAE39B67FAE0C2C1047 /* AddMaterialSheets.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

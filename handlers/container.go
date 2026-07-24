@@ -11,6 +11,7 @@ type Handlers struct {
 	StudentSchedule *StudentScheduleHandler
 	Activity        *ActivityHandler
 	StudentMaterial *StudentMaterialHandler
+	StudentPiece    *StudentPieceHandler
 }
 
 func NewHandlers(services *service.Services) *Handlers {
@@ -21,5 +22,6 @@ func NewHandlers(services *service.Services) *Handlers {
 		StudentSchedule: NewStudentScheduleHandler(services.StudentSchedule),
 		Activity:        NewActivityHandler(services.Activity),
 		StudentMaterial: NewStudentMaterialHandler(services.StudentMaterial),
+		StudentPiece:    NewStudentPieceHandler(services.StudentPiece),
 	}
 }

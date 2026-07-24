@@ -11,6 +11,7 @@ type Services struct {
 	StudentSchedule *StudentScheduleService
 	Activity        *ActivityService
 	StudentMaterial *StudentMaterialService
+	StudentPiece    *StudentPieceService
 }
 
 func NewServices(repos *db.Repositories) *Services {
@@ -24,5 +25,6 @@ func NewServices(repos *db.Repositories) *Services {
 		StudentSchedule: NewStudentScheduleService(repos.StudentSchedule, repos.Student),
 		Activity:        activityService,
 		StudentMaterial: NewStudentMaterialService(repos.StudentMaterial, repos.Student),
+		StudentPiece:    NewStudentPieceService(repos.StudentPiece, repos.Student, repos.StudentMaterial),
 	}
 }
