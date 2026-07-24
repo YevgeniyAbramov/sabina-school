@@ -97,10 +97,21 @@ func (s *DiaryShareService) ViewByToken(ctx context.Context, token string, fileB
 		return nil, err
 	}
 
+	completed := student.TotalLessons - student.RemainingLessons
+	if completed < 0 {
+		completed = 0
+	}
+
 	view := &models.PublicDiaryView{
-		StudentName: strings.TrimSpace(student.FirstName + " " + student.LastName),
-		ExpiresAt:   link.ExpiresAt,
-		Pieces:      make([]models.PublicDiaryPiece, 0, len(pieces)),
+		StudentName:      strings.TrimSpace(student.FirstName + " " + student.LastName),
+		CompletedLessons: completed,
+		TotalLessons:     student.TotalLessons,
+		RemainingLessons: student.RemainingLessons,
+		MissedClasses:    student.MissedClasses,
+		PaidAmount:       student.PaidAmount,
+		IsPaid:           student.IsPaid,
+		ExpiresAt:        link.ExpiresAt,
+		Pieces:           make([]models.PublicDiaryPiece, 0, len(pieces)),
 	}
 
 	for _, p := range pieces {

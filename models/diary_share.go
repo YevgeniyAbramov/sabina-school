@@ -21,9 +21,15 @@ type DiaryShareCreateResult struct {
 
 // PublicDiaryView is what parents see — no lesson notes.
 type PublicDiaryView struct {
-	StudentName string             `json:"student_name"`
-	ExpiresAt   time.Time          `json:"expires_at"`
-	Pieces      []PublicDiaryPiece `json:"pieces"`
+	StudentName      string             `json:"student_name"`
+	CompletedLessons int                `json:"completed_lessons"`
+	TotalLessons     int                `json:"total_lessons"`
+	RemainingLessons int                `json:"remaining_lessons"`
+	MissedClasses    int                `json:"missed_classes"`
+	PaidAmount       int                `json:"paid_amount"`
+	IsPaid           bool               `json:"is_paid"`
+	ExpiresAt        time.Time          `json:"expires_at"`
+	Pieces           []PublicDiaryPiece `json:"pieces"`
 }
 
 type PublicDiaryPiece struct {
