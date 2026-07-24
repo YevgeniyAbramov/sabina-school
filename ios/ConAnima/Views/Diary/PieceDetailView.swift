@@ -23,9 +23,8 @@ struct PieceDetailView: View {
     @State private var pendingFile: PendingFile?
     @State private var deleteMaterial: StudentMaterial?
     @State private var deleteNote: StudentPieceNote?
-    @State private var shareImage: UIImage?
-    @State private var isRenderingShare = false
     @State private var readinessSaveTask: Task<Void, Never>?
+    @State private var isHydrating = true
 
     private enum MaterialFilter: Hashable {
         case all, notes, links
@@ -65,7 +64,6 @@ struct PieceDetailView: View {
         .background { AppCanvasBackground() }
         .navigationTitle(vm.detail?.title ?? "Произведение")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { toolbarContent }
         .sheet(isPresented: $showAddLink) {
             AddLinkSheet { title, url, note in
                 try await vm.addLink(
@@ -96,12 +94,6 @@ struct PieceDetailView: View {
             }
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
-        }
-        .sheet(item: Binding(
-            get: { shareImage.map { ShareImageItem(image: $0) } },
-            set: { if $0 == nil { shareImage = nil } }
-        )) { item in
-            ShareSheet(items: [item.image])
         }
         .photosPicker(isPresented: $showPhotoPicker, selection: $photoPickerItem, matching: .images)
         .onChange(of: photoPickerItem) { _, item in
@@ -161,49 +153,52 @@ struct PieceDetailView: View {
             }
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.85), value: vm.toast)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if vm.detail != nil {
+                addBar
+            }
+        }
         .task {
+            isHydrating = true
             await vm.load(studentId: studentId, pieceId: pieceId, onUnauthorized: auth.handleUnauthorized)
             if let detail = vm.detail {
                 readiness = Double(detail.readiness)
                 status = detail.status
             }
+            // Let SwiftUI settle before treating slider/status changes as user edits.
+            try? await Task.sleep(for: .milliseconds(100))
+            isHydrating = false
         }
     }
 
-    @ToolbarContentBuilder
-    private var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .primaryAction) {
-            Menu {
-                Button { showAddNote = true } label: {
-                    Label("Заметка с урока", systemImage: "text.badge.plus")
-                }
-                Button { showAddLink = true } label: {
-                    Label("Ссылка", systemImage: "link")
-                }
-                Button { showPhotoPicker = true } label: {
-                    Label("Фото нот", systemImage: "photo")
-                }
-                Button { showFileImporter = true } label: {
-                    Label("Файл (PDF)", systemImage: "doc")
-                }
-            } label: {
-                Image(systemName: "plus")
-            }
-            .accessibilityLabel("Добавить")
+    private var addBar: some View {
+        HStack(spacing: 8) {
+            addChip(title: "Заметка", systemImage: "text.badge.plus") { showAddNote = true }
+            addChip(title: "Ссылка", systemImage: "link") { showAddLink = true }
+            addChip(title: "Фото", systemImage: "photo") { showPhotoPicker = true }
+            addChip(title: "PDF", systemImage: "doc") { showFileImporter = true }
         }
-        ToolbarItem(placement: .topBarTrailing) {
-            Button {
-                Task { await renderShare() }
-            } label: {
-                if isRenderingShare {
-                    ProgressView()
-                } else {
-                    Image(systemName: "square.and.arrow.up")
-                }
+        .padding(.horizontal, 12)
+        .padding(.top, 10)
+        .padding(.bottom, 8)
+        .background(.bar)
+    }
+
+    private func addChip(title: String, systemImage: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Image(systemName: systemImage)
+                    .font(.body.weight(.semibold))
+                Text(title)
+                    .font(.caption2.weight(.semibold))
             }
-            .disabled(vm.detail == nil || isRenderingShare)
-            .accessibilityLabel("Поделиться карточкой")
+            .foregroundStyle(AppTheme.primary)
+            .frame(maxWidth: .infinity)
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
     }
 
     private func listContent(_ detail: PieceDetail) -> some View {
@@ -223,12 +218,10 @@ struct PieceDetailView: View {
             }
 
             Section {
-                headerRow(title: "Заметки с уроков", actionTitle: "Добавить") {
-                    showAddNote = true
-                }
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 4, trailing: 16))
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
+                headerRow(title: "Заметки с уроков")
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 4, trailing: 16))
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
 
                 if detail.notes.isEmpty {
                     emptyInline(
@@ -350,11 +343,18 @@ struct PieceDetailView: View {
                 Slider(value: $readiness, in: 0...100, step: 5)
                     .tint(AppTheme.primary)
                     .onChange(of: readiness) { _, newValue in
+                        guard !isHydrating else { return }
                         readinessSaveTask?.cancel()
+                        let value = Int(newValue.rounded())
                         readinessSaveTask = Task {
-                            try? await Task.sleep(for: .milliseconds(450))
+                            do {
+                                try await Task.sleep(for: .milliseconds(450))
+                            } catch {
+                                return
+                            }
                             guard !Task.isCancelled else { return }
-                            await persistMeta(readiness: Int(newValue.rounded()))
+                            // Unstructured task: newer slides cancel only the wait, not an in-flight PUT.
+                            Task { await persistMeta(readiness: value) }
                         }
                     }
             }
@@ -373,19 +373,15 @@ struct PieceDetailView: View {
             selection: $status
         )
         .onChange(of: status) { _, newValue in
+            guard !isHydrating else { return }
             Task { await persistMeta(status: newValue) }
         }
     }
 
-    private func headerRow(title: String, actionTitle: String, action: @escaping () -> Void) -> some View {
-        HStack {
-            Text(title)
-                .font(.headline)
-            Spacer()
-            Button(actionTitle, action: action)
-                .font(.subheadline.weight(.semibold))
-                .frame(minHeight: 44)
-        }
+    private func headerRow(title: String) -> some View {
+        Text(title)
+            .font(.headline)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func noteRow(_ note: StudentPieceNote) -> some View {
@@ -434,22 +430,6 @@ struct PieceDetailView: View {
             onUnauthorized: auth.handleUnauthorized
         )
     }
-
-    @MainActor
-    private func renderShare() async {
-        guard let detail = vm.detail else { return }
-        isRenderingShare = true
-        defer { isRenderingShare = false }
-        let card = PieceShareCard(
-            studentName: student?.fullName ?? "Ученик",
-            piece: detail
-        )
-        let renderer = ImageRenderer(content: card)
-        renderer.scale = UIScreen.main.scale
-        if let image = renderer.uiImage {
-            shareImage = image
-        }
-    }
 }
 
 // MARK: - Helpers
@@ -496,21 +476,6 @@ private extension PieceDetailView {
             break
         }
     }
-}
-
-private struct ShareImageItem: Identifiable {
-    let id = UUID()
-    let image: UIImage
-}
-
-private struct ShareSheet: UIViewControllerRepresentable {
-    let items: [Any]
-
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
-    }
-
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 private struct MaterialRowView: View {
@@ -646,123 +611,6 @@ struct AddLessonNoteSheet: View {
             dismiss()
         } catch {
             self.error = (error as? LocalizedError)?.errorDescription ?? "Не удалось сохранить"
-        }
-    }
-}
-
-/// Share card rendered to an image via `ImageRenderer`.
-struct PieceShareCard: View {
-    let studentName: String
-    let piece: PieceDetail
-
-    private var notes: [StudentMaterial] { piece.materials.filter { $0.kind == .file } }
-    private var links: [StudentMaterial] { piece.materials.filter { $0.kind == .link } }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            HStack {
-                Text("CON ANIMA")
-                    .font(.caption.weight(.bold))
-                    .tracking(1.2)
-                    .foregroundStyle(AppTheme.primary)
-                Spacer()
-                Text(piece.status.title)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(AppTheme.primary, in: Capsule())
-            }
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text(studentName)
-                    .font(.title3.weight(.bold))
-                Text(piece.title)
-                    .font(.title2.weight(.bold))
-                    .fixedSize(horizontal: false, vertical: true)
-                if !piece.composer.isEmpty {
-                    Text(piece.composer)
-                        .font(.body)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            HStack(spacing: 16) {
-                VStack(spacing: 4) {
-                    Text("\(piece.readiness)%")
-                        .font(.system(size: 36, weight: .bold, design: .rounded))
-                        .foregroundStyle(AppTheme.primary)
-                    Text("готовность")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(AppTheme.primary.opacity(0.1), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Label("\(notes.count) нот", systemImage: "doc.richtext")
-                    Label("\(links.count) ссылок", systemImage: "link")
-                    Label("\(piece.notes.count) заметок", systemImage: "text.alignleft")
-                }
-                .font(.subheadline.weight(.medium))
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-
-            if !notes.isEmpty {
-                section("Ноты") {
-                    ForEach(notes.prefix(5)) { m in
-                        Text("• \(m.title)")
-                            .font(.subheadline)
-                    }
-                }
-            }
-
-            if !links.isEmpty {
-                section("Ссылки") {
-                    ForEach(links.prefix(5)) { m in
-                        Text("• \(m.title)")
-                            .font(.subheadline)
-                        if !m.url.isEmpty {
-                            Text(m.url)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                        }
-                    }
-                }
-            }
-
-            if !piece.notes.isEmpty {
-                section("С уроков") {
-                    ForEach(piece.notes.prefix(4)) { n in
-                        Text("• \(n.body)")
-                            .font(.subheadline)
-                            .lineLimit(2)
-                    }
-                }
-            }
-        }
-        .padding(28)
-        .frame(width: 390, alignment: .leading)
-        .background(
-            LinearGradient(
-                colors: [
-                    Color(red: 0.97, green: 0.98, blue: 1.0),
-                    Color(red: 0.93, green: 0.95, blue: 0.99),
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-    }
-
-    private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.caption.weight(.bold))
-                .foregroundStyle(.secondary)
-            content()
         }
     }
 }

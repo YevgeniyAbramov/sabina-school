@@ -444,6 +444,19 @@ enum API {
         )
         guard r.status else { throw APIError.message(r.message ?? "Не удалось удалить заметку") }
     }
+
+    static func createDiaryShare(studentId: Int, daysValid: Int = 30) async throws -> DiaryShareCreateResult {
+        struct Body: Codable { var daysValid: Int; enum CodingKeys: String, CodingKey { case daysValid = "days_valid" } }
+        let r: ApiResponse<DiaryShareCreateResult> = try await APIClient.shared.request(
+            "/student/\(studentId)/diary-share",
+            method: "POST",
+            body: Body(daysValid: daysValid)
+        )
+        guard r.status, let data = r.data else {
+            throw APIError.message(r.message ?? "Не удалось создать ссылку")
+        }
+        return data
+    }
 }
 
 extension StudentMaterial {

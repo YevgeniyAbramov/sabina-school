@@ -14,13 +14,18 @@ func Use(app *fiber.App,
 	scheduleHandler *handler.StudentScheduleHandler,
 	activityHandler *handler.ActivityHandler,
 	materialHandler *handler.StudentMaterialHandler,
-	pieceHandler *handler.StudentPieceHandler) {
+	pieceHandler *handler.StudentPieceHandler,
+	diaryShareHandler *handler.DiaryShareHandler) {
 
 	app.Get("/status", handler.CheckStatus)
+
+	// Public parent page (no auth) — must be registered before SPA static.
+	app.Get("/share/diary/:token", diaryShareHandler.PublicPage)
+
 	api := app.Group("/api/v1/")
-	// Публичные роуты (без авторизации)
 	api.Post("/auth/login", authHandler.Login)
-	// Защищенные роуты (требуют токен)
+	api.Get("/public/diary/:token", diaryShareHandler.PublicJSON)
+
 	protected := api.Group("/", middleware.AuthRequired())
 
 	protected.Post("/students", studentHandler.CreateStudent)
@@ -51,4 +56,6 @@ func Use(app *fiber.App,
 	protected.Delete("/student/:id/pieces/:pieceId", pieceHandler.Delete)
 	protected.Post("/student/:id/pieces/:pieceId/notes", pieceHandler.AddNote)
 	protected.Delete("/student/:id/pieces/:pieceId/notes/:noteId", pieceHandler.DeleteNote)
+
+	protected.Post("/student/:id/diary-share", diaryShareHandler.Create)
 }

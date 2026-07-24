@@ -259,6 +259,33 @@ final class DiaryViewModel {
         }
     }
 
+    @MainActor
+    func createShare(studentId: Int, onUnauthorized: () -> Void) async -> URL? {
+        do {
+            let result = try await API.createDiaryShare(studentId: studentId)
+            if let url = URL(string: result.url), url.scheme != nil, url.host != nil {
+                return url
+            }
+            var components = URLComponents(url: AppConfig.apiBaseURL, resolvingAgainstBaseURL: false)
+            components?.path = ""
+            components?.query = nil
+            components?.fragment = nil
+            if let root = components?.url,
+               let url = URL(string: result.url.hasPrefix("/") ? result.url : "/\(result.url)", relativeTo: root)?.absoluteURL
+            {
+                return url
+            }
+            showToast("Некорректная ссылка", error: true)
+            return nil
+        } catch is AuthError {
+            onUnauthorized()
+            return nil
+        } catch {
+            showToast((error as? LocalizedError)?.errorDescription ?? "Не удалось создать ссылку", error: true)
+            return nil
+        }
+    }
+
     private func showToast(_ message: String, error: Bool) {
         toastIsError = error
         toast = message
@@ -298,6 +325,12 @@ final class PieceDetailViewModel {
         onUnauthorized: () -> Void
     ) async {
         guard let detail else { return }
+        // Skip no-op writes (e.g. hydration syncing local state from server).
+        if detail.readiness == readiness && detail.status == status
+            && detail.title == title && detail.composer == composer
+        {
+            return
+        }
         do {
             let updated = try await API.updatePiece(
                 studentId: studentId,
@@ -311,6 +344,10 @@ final class PieceDetailViewModel {
             self.detail?.updatedAt = updated.updatedAt
         } catch is AuthError {
             onUnauthorized()
+        } catch is CancellationError {
+            return
+        } catch let error as URLError where error.code == .cancelled {
+            return
         } catch {
             showToast("Не удалось сохранить готовность", error: true)
         }

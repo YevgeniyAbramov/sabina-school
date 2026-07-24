@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Diary for one student — list of repertoire pieces (not lesson counts).
 struct DiaryDetailView: View {
@@ -10,6 +11,8 @@ struct DiaryDetailView: View {
 
     @State private var showAddPiece = false
     @State private var deleteTarget: StudentPiece?
+    @State private var shareURL: URL?
+    @State private var isCreatingShare = false
 
     private var student: Student? {
         studentsVM.students.first { $0.id == studentId }
@@ -27,6 +30,19 @@ struct DiaryDetailView: View {
         .navigationTitle("Дневник")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    Task { await shareDiary() }
+                } label: {
+                    if isCreatingShare {
+                        ProgressView()
+                    } else {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                }
+                .disabled(isCreatingShare || vm.isLoading)
+                .accessibilityLabel("Поделиться дневником")
+            }
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     showAddPiece = true
@@ -47,6 +63,12 @@ struct DiaryDetailView: View {
             }
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
+        }
+        .sheet(item: Binding(
+            get: { shareURL.map { ShareURLItem(url: $0) } },
+            set: { if $0 == nil { shareURL = nil } }
+        )) { item in
+            DiaryShareSheet(items: [item.url])
         }
         .alert(
             "Удалить произведение?",
@@ -86,6 +108,14 @@ struct DiaryDetailView: View {
         }
         .refreshable {
             await vm.load(studentId: studentId, onUnauthorized: auth.handleUnauthorized)
+        }
+    }
+
+    private func shareDiary() async {
+        isCreatingShare = true
+        defer { isCreatingShare = false }
+        if let url = await vm.createShare(studentId: studentId, onUnauthorized: auth.handleUnauthorized) {
+            shareURL = url
         }
     }
 
@@ -318,4 +348,19 @@ struct AddPieceSheet: View {
             self.error = (error as? LocalizedError)?.errorDescription ?? "Не удалось сохранить"
         }
     }
+}
+
+private struct ShareURLItem: Identifiable {
+    let id = UUID()
+    let url: URL
+}
+
+private struct DiaryShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }

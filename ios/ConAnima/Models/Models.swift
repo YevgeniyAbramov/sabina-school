@@ -314,6 +314,17 @@ struct PieceNoteInput: Codable {
     var body: String
 }
 
+struct DiaryShareCreateResult: Codable, Hashable {
+    var token: String
+    var url: String
+    var expiresAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case token, url
+        case expiresAt = "expires_at"
+    }
+}
+
 /// One entry under a piece — link or uploaded file (sheet music).
 struct StudentMaterial: Codable, Identifiable, Hashable {
     let id: Int
